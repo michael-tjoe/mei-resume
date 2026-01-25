@@ -1,0 +1,43 @@
+---
+description: Avoid CSS gap property for browser compatibility
+globs: "**/*.{tsx,jsx,css}"
+alwaysApply: false
+---
+
+# Avoid CSS Gap Property
+
+Do NOT use CSS `gap` property (including Tailwind `gap-*` classes) unless the user explicitly requests it. The `gap` property is not supported on older browsers (Safari < 14.1, iOS Safari < 14.5).
+
+## Instead of gap, use margins
+
+```tsx
+// ❌ BAD - Using gap
+<div className="flex flex-col gap-4">
+  <Item />
+  <Item />
+</div>
+
+// ✅ GOOD - Using margin with last:mb-0
+<div className="flex flex-col">
+  <Item className="mb-4 last:mb-0" />
+  <Item className="mb-4 last:mb-0" />
+</div>
+
+// ✅ GOOD - Using space-y (applies margin between children)
+<div className="flex flex-col space-y-4">
+  <Item />
+  <Item />
+</div>
+```
+
+## Alternatives
+
+| Instead of | Use |
+|------------|-----|
+| `gap-4` | `space-y-4` (vertical) or `space-x-4` (horizontal) |
+| `gap-2` | `mb-2 last:mb-0` on children |
+| `gap-[8px]` | `mb-[8px] last:mb-0` on children |
+
+## Exception
+
+Only use `gap` if the user explicitly asks for it or states browser compatibility is not a concern.

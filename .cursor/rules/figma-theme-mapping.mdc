@@ -1,0 +1,63 @@
+---
+description: Map Figma design tokens to Tailwind theme variables
+alwaysApply: true
+---
+
+# Figma to Tailwind Theme Mapping
+
+When the user shares Figma data (via link selection or MCP tool), always map Figma values to the project's theme variables defined in `src/styles.css`.
+
+## Color Mapping
+
+| Figma Hex | Tailwind Class | CSS Variable |
+|-----------|----------------|--------------|
+| `#321000` | `brand-dark` | `--color-brand-dark` |
+| `#C9B08D` / `#c9b08d` | `brand-tan` | `--color-brand-tan` |
+| `#9E4F00` / `#9e4f00` | `brand-orange` | `--color-brand-orange` |
+| `#FAF3E7` / `#faf3e7` | `brand-cream` | `--color-brand-cream` |
+| `#1C1D1B` / `#1c1d1b` | `brand-charcoal` | `--color-brand-charcoal` |
+| `#E9E9E9` / `#e9e9e9` | `brand-gray` | `--color-brand-gray` |
+
+## Font Mapping
+
+| Figma Font | Tailwind Class |
+|------------|----------------|
+| `Sora` | `font-sora` |
+| `Meie Script` | `font-script` |
+
+## Font Size Mapping
+
+| Figma Size | Tailwind Class |
+|------------|----------------|
+| `96px` | `text-display` |
+| `80px` | `text-h1` |
+| `44px` | `text-h2` |
+| `40px` | `text-h2-alt` |
+| `35px` | `text-h3` |
+| `32px` | `text-h4` |
+| `24px` | `text-h5` |
+| `22px` | `text-body` |
+| `20px` | `text-body-sm` |
+| `14px` | `text-caption` |
+
+## Font Weight Mapping
+
+| Figma Weight | Tailwind Class |
+|--------------|----------------|
+| `300` / Light | `font-light` |
+| `400` / Regular | `font-normal` |
+| `500` / Medium | `font-medium` |
+| `600` / SemiBold | `font-semibold` |
+| `700` / Bold | `font-bold` |
+
+## Example
+
+```tsx
+// ❌ BAD - Using raw Figma values
+<h1 style={{ fontFamily: 'Sora', fontSize: '80px', color: '#321000' }}>
+
+// ✅ GOOD - Using theme variables
+<h1 className="font-sora text-h1 text-brand-dark font-bold">
+```
+
+Always prefer Tailwind classes over inline styles or arbitrary values.

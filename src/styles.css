@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom Breakpoints */
+  --breakpoint-tablet: 600px;
+  --breakpoint-tablet-lg: 768px;
+  --breakpoint-desktop: 840px;
+
+  /* Colors from Figma Style Guide */
+  --color-brand-dark: #321000;
+  --color-brand-tan: #c9b08d;
+  --color-brand-orange: #9e4f00;
+  --color-brand-cream: #faf3e7;
+  --color-brand-charcoal: #1c1d1b;
+  --color-brand-gray: #e9e9e9;
+
+  /* Font Families */
+  --font-sora: "Sora", sans-serif;
+  --font-script: "Meie Script", cursive;
+
+  /* Font Sizes - Typography Scale from Figma */
+  --font-size-display: 96px;
+  --font-size-h1: 80px;
+  --font-size-h2: 44px;
+  --font-size-h2-alt: 40px;
+  --font-size-h3: 35px;
+  --font-size-h4: 32px;
+  --font-size-h5: 24px;
+  --font-size-body: 22px;
+  --font-size-body-sm: 20px;
+  --font-size-caption: 14px;
+
+  /* Line Heights matching Figma */
+  --line-height-tight: 0.725;
+  --line-height-snug: 1.125;
+  --line-height-normal: 1.26;
+  --line-height-relaxed: 1.3;
+  --line-height-loose: 1.44;
+
+  /* Spacing */
+  --spacing-side: 24px;
+
+  /* Z-Index Scale */
+  --znavbar: 50;
+}
+
+body {
+  @apply m-0 bg-brand-cream font-sora text-brand-charcoal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
