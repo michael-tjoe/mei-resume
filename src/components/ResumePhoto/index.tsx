@@ -99,7 +99,7 @@ function ResumePhoto({
             <Melody className="tablet:top-[42px] tablet:right-[3%] tablet-lg:right-[12%] right-side absolute top-[30px]" />
 
             {/* Name section */}
-            <div className="desktop:hidden relative">
+            <div className="desktop:hidden">
               <NameSection
                 greeting={greeting}
                 firstName={firstName}
@@ -121,7 +121,7 @@ function ResumePhoto({
       </div>
 
       <div className="desktop:flex hidden w-full shrink grow-0 basis-[17.61%]">
-        <div className="bg-brand-cream py-8 -translate-y-1/2 rounded-r-[45px] z-20 w-1/2">
+        <div className="bg-brand-cream z-20 w-1/2 -translate-y-1/2 rounded-r-[45px] pt-8">
           <NameSection
             firstName={firstName}
             lastName={lastName}
