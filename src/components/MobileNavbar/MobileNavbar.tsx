@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
+
+import { useViewport } from '../../providers/ViewportProvider'
 import MobileNavbarMenu from './MobileNavbarMenu'
 
 function HamburgerIcon() {
@@ -43,15 +46,16 @@ function HamburgerIcon() {
 
 function MobileNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { isDesktop } = useViewport()
 
-  return (
+  const navbarContent = (
     <nav
-      className="sticky top-0 z-(--znavbar) flex h-[49px] w-full items-center justify-end bg-brand-tan px-side"
-      aria-label="Mobile navigation"
+      className="desktop:justify-center bg-brand-tan px-side desktop:h-full desktop:w-[72px] desktop:items-start desktop:px-0 desktop:fixed sticky top-0 left-0 z-(--znavbar) flex h-[49px] w-full items-center justify-end"
+      aria-label="Navigation"
     >
       <button
         type="button"
-        className="text-white transition-opacity hover:opacity-80"
+        className="desktop:absolute desktop:bg-brand-tan desktop:-top-2 desktop:left-4 desktop:py-[56px] desktop:w-[128px] desktop:rounded-r-[50px] relative flex flex-col items-center justify-center text-white transition-opacity hover:opacity-80"
         aria-label="Open menu"
         onClick={() => setIsMenuOpen(true)}
       >
@@ -64,6 +68,8 @@ function MobileNavbar() {
       />
     </nav>
   )
+
+  return isDesktop ? createPortal(navbarContent, document.body) : navbarContent
 }
 
 export default MobileNavbar

@@ -1,0 +1,20 @@
+---
+description: Use classnames package for conditional/merged classNames
+alwaysApply: true
+---
+
+# Classnames utility
+
+When merging or conditionally applying Tailwind/className strings, use the `classnames` package and import it as `cn`:
+
+```ts
+import cn from 'classnames'
+```
+
+Use `cn()` for component wrapper classNames (e.g. base classes + optional `className` prop):
+
+```tsx
+<div className={cn(defaultWrapperClass, className)}>
+```
+
+Prefer `cn` over template literals or manual `.trim()` for combining class names.

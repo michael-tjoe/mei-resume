@@ -8,7 +8,7 @@ function SoftwareAppCard({
 }: React.PropsWithChildren<{ className?: string }>) {
   return (
     <div
-      className={`cursor-pointer border-2 border-brand-dark bg-brand-cream transition-colors duration-300 ease-in-out hover:bg-brand-dark hover:[&_path]:fill-white active:bg-brand-dark active:[&_path]:fill-white [&_path]:transition-[fill] [&_path]:duration-300 [&_path]:ease-in-out flex h-[34px] w-[34px] shrink-0 grow-0 items-center justify-center overflow-hidden rounded-[5px] ${className}`.trim()}
+      className={`border-brand-dark bg-brand-cream hover:bg-brand-dark active:bg-brand-dark desktop:h-[78px] desktop:w-[78px] mr-[6px] flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[5px] border-2 transition-colors duration-300 ease-in-out last:mr-0 [&_path]:transition-[fill] [&_path]:duration-300 [&_path]:ease-in-out hover:[&_path]:fill-white active:[&_path]:fill-white ${className}`.trim()}
       aria-hidden
     >
       {children}

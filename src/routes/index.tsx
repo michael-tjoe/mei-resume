@@ -2,9 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import About from '@/components/About'
 import MobileNavbar from '@/components/MobileNavbar'
 import ResumePhoto from '@/components/ResumePhoto'
-import SoftwareApplist from '@/components/SoftwareApplist'
+import SectionTitle from '@/components/SectionTitle'
+import Timeline from '@/components/Timeline'
+import Divider from '@/components/Divider'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -84,28 +87,29 @@ function App() {
     >
       <div
         ref={panelsRef}
-        className="desktop:h-full desktop:flex-row flex flex-col"
+        className="desktop:h-full desktop:flex-row relative flex flex-col"
       >
         <MobileNavbar />
 
-        <section className={`relative desktop:h-screen flex w-full shrink-0 flex-col`}>
-          <ResumePhoto
-            greeting="hi, i'm"
-            firstName="Stefanny"
-            lastName="kusuma"
-          />
-        </section>
         <section
-          className={`desktop:w-screen flex h-screen w-full shrink-0 flex-col justify-center bg-brand-dark`}
+          className={`desktop:pt-[56px] desktop:pl-[144px] desktop:w-auto relative z-(--zphoto-resume) flex w-full shrink-0 flex-col`}
         >
-          <div className="max-w-2xl px-8 py-8 text-center">
-            <span className="mb-4 inline-block rounded-full bg-white/20 px-4 py-1 text-sm font-medium backdrop-blur-sm">
-              Hello world
-            </span>
-            <h1 className="mb-6 text-6xl font-bold tracking-tight md:text-8xl">
-              title
-            </h1>
-            <p className="text-xl opacity-80 md:text-2xl">Desc</p>
+          <div className="desktop:aspect-516/727 desktop:pl-6 desktop:min-w-[1032px] desktop:pr-12 flex h-full flex-col">
+            <Divider className="desktop:block hidden" color="brand-brown" />
+            <ResumePhoto
+              greeting="hi, i'm"
+              firstName="Stefanny"
+              lastName="kusuma"
+            />
+          </div>
+        </section>
+        <About />
+        <section
+          className={`desktop:h-screen desktop:w-fit px-side relative flex w-full flex-col pt-4`}
+        >
+          <SectionTitle text="experiences" />
+          <div className="mt-4 pb-11">
+            <Timeline />
           </div>
         </section>
       </div>

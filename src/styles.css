@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Custom Breakpoints */
@@ -10,13 +10,14 @@
   --color-brand-dark: #321000;
   --color-brand-tan: #c9b08d;
   --color-brand-orange: #9e4f00;
+  --color-brand-brown: #9e4f00;
   --color-brand-cream: #faf3e7;
   --color-brand-charcoal: #1c1d1b;
   --color-brand-gray: #e9e9e9;
 
   /* Font Families */
-  --font-sora: "Sora", sans-serif;
-  --font-script: "Meie Script", cursive;
+  --font-sora: 'Sora', sans-serif;
+  --font-script: 'Meie Script', cursive;
 
   /* Font Sizes - Typography Scale from Figma */
   --font-size-display: 96px;
@@ -26,31 +27,57 @@
   --font-size-h3: 35px;
   --font-size-h4: 32px;
   --font-size-h5: 24px;
-  --font-size-body: 22px;
-  --font-size-body-sm: 20px;
+  --font-size-body: 11px;
   --font-size-caption: 14px;
 
-  /* Line Heights matching Figma */
-  --line-height-tight: 0.725;
-  --line-height-snug: 1.125;
-  --line-height-normal: 1.26;
-  --line-height-relaxed: 1.3;
+  --text-portofolio-title: 18px;
+  --text-portofolio-title--line-height: 20px;
+  --text-portofolio-title--font-weight: 700;
+
+  --text-portofolio-subtitle: 16px;
+  --text-portofolio-subtitle--line-height: 20px;
+
+  --text-portofolio-name: 40px;
+  --text-portofolio-name--line-height: 50px;
+  --text-portofolio-name--font-weight: 700;
+
+  --text-portofolio-nameshadow: 24px;
+  --text-portofolio-nameshadow--line-height: 30px;
+  --text-portofolio-nameshadow--font-weight: 700;
+  --text-portofolio-nameshadow--font-family: 'Meie Script';
+
+  --text-portofolio-body: 13px;
+  --text-portofolio-body--line-height: 16px;
+
   --line-height-loose: 1.44;
 
   /* Spacing */
   --spacing-side: 24px;
 
   /* Z-Index Scale */
+  --zphoto-resume: 20;
   --znavbar: 50;
 }
 
-body {
-  @apply m-0 bg-brand-cream font-sora text-brand-charcoal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@media (min-width: 600px) {
+  :root {
+    --spacing-side: 40px;
+    --text-portofolio-name: 46px;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+@media (min-width: 840px) {
+  :root {
+    --text-portofolio-name: 96px;
+    --text-portofolio-name--line-height: 121px;
+
+    --text-portofolio-nameshadow: 40px;
+    --text-portofolio-nameshadow--line-height: 51px;
+  }
+}
+
+body {
+  @apply bg-brand-cream font-sora text-brand-charcoal m-0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import gsap from 'gsap'
 import BrandLogo from '@/components/BrandLogo'
 
@@ -79,9 +80,9 @@ function MobileNavbarMenu({ isOpen, onClose }: MobileNavbarMenuProps) {
 
   if (!shouldRender) return null
 
-  return (
+  const menuContent = (
     <>
-      {/* Background overlay */}
+      {/* Background overlay - fixed to viewport */}
       <div
         ref={overlayRef}
         className="fixed inset-0 z-(--znavbar) bg-black opacity-0"
@@ -89,10 +90,10 @@ function MobileNavbarMenu({ isOpen, onClose }: MobileNavbarMenuProps) {
         aria-hidden="true"
       />
 
-      {/* Menu panel */}
+      {/* Menu panel - fixed to viewport */}
       <div
         ref={menuRef}
-        className="z-(--znavbar) fixed top-0 left-0 w-full rounded-b-[30px] bg-brand-tan pb-8"
+        className="fixed top-0 left-0 right-0 z-(--znavbar) w-full rounded-b-[30px] bg-brand-tan pb-8"
       >
         {/* Close button */}
         <button
@@ -149,6 +150,8 @@ function MobileNavbarMenu({ isOpen, onClose }: MobileNavbarMenuProps) {
       </div>
     </>
   )
+
+  return createPortal(menuContent, document.body)
 }
 
 export default MobileNavbarMenu
