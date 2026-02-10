@@ -44,7 +44,10 @@
   --text-portofolio-nameshadow: 24px;
   --text-portofolio-nameshadow--line-height: 30px;
   --text-portofolio-nameshadow--font-weight: 700;
-  --text-portofolio-nameshadow--font-family: 'Meie Script';
+
+  --text-portofolio-title-badge: 12px;
+  --text-portofolio-title-badge--line-height: 15px;
+  --text-portofolio-title-badge--font-weight: 700;
 
   --text-portofolio-body: 13px;
   --text-portofolio-body--line-height: 16px;
@@ -73,6 +76,15 @@
 
     --text-portofolio-nameshadow: 40px;
     --text-portofolio-nameshadow--line-height: 51px;
+
+    --text-portofolio-title-badge: 22px;
+    --text-portofolio-title-badge--line-height: 28px;
+
+    --text-portofolio-title: 40px;
+    --text-portofolio-title--line-height: 50px;
+
+    --text-portofolio-body: 20px;
+    --text-portofolio-body--line-height: 25px;
   }
 }
 

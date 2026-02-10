@@ -2,47 +2,8 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { useViewport } from '../../providers/ViewportProvider'
+import HamburgerIcon from './HamburgerIcon'
 import MobileNavbarMenu from './MobileNavbarMenu'
-
-function HamburgerIcon() {
-  return (
-    <svg
-      width="27"
-      height="16"
-      viewBox="0 0 27 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <line
-        x1="0"
-        y1="1.5"
-        x2="26.85"
-        y2="1.5"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="0"
-        y1="8"
-        x2="26.85"
-        y2="8"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <line
-        x1="0"
-        y1="14.5"
-        x2="26.85"
-        y2="14.5"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
 
 function MobileNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -50,16 +11,16 @@ function MobileNavbar() {
 
   const navbarContent = (
     <nav
-      className="desktop:justify-center bg-brand-tan px-side desktop:h-full desktop:w-[72px] desktop:items-start desktop:px-0 desktop:fixed sticky top-0 left-0 z-(--znavbar) flex h-[49px] w-full items-center justify-end"
+      className="sticky top-0 left-0 z-(--znavbar) flex h-[49px] w-full items-center justify-end bg-brand-tan px-side desktop:fixed desktop:h-full desktop:w-[72px] desktop:items-start desktop:justify-center desktop:px-0"
       aria-label="Navigation"
     >
       <button
         type="button"
-        className="desktop:absolute desktop:bg-brand-tan desktop:-top-2 desktop:left-4 desktop:py-[56px] desktop:w-[128px] desktop:rounded-r-[50px] relative flex flex-col items-center justify-center text-white transition-opacity hover:opacity-80"
+        className="relative flex cursor-pointer flex-col items-center justify-center text-white transition-opacity desktop:absolute desktop:-top-2 desktop:z-(--znavbar) desktop:h-[139px] desktop:w-[216px] desktop:rounded-r-[50px] desktop:bg-brand-tan"
         aria-label="Open menu"
         onClick={() => setIsMenuOpen(true)}
       >
-        <HamburgerIcon />
+        <HamburgerIcon className="desktop:ml-11" />
       </button>
 
       <MobileNavbarMenu

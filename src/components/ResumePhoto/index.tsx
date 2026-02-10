@@ -8,9 +8,11 @@ import Melody from '../Decorations/Melody'
 import SoftwareApplist from '../SoftwareApplist'
 import Divider from '../Divider'
 import NameSection from '../NameSection'
+import TitleBadge from '../TitleBadge'
 import gsap from 'gsap'
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin'
 import { useEffect } from 'react'
+import Chalks from '../Decorations/Chalks'
 
 interface ResumePhotoProps {
   greeting?: string
@@ -30,7 +32,7 @@ function ResumePhoto({
   const fullName = `${firstName} ${lastName}`
 
   useEffect(() => {
-    gsap.from('#svgMei', { duration: 3, drawSVG: 0 })
+    gsap.from('#svgMei', { duration: 2, drawSVG: 0 })
   }, [])
 
   return (
@@ -53,7 +55,7 @@ function ResumePhoto({
         }
       `}</style>
 
-      <div className="desktop:flex relative hidden w-full flex-row items-center justify-end gap-6 pt-18 pb-8">
+      <div className="relative hidden w-full flex-row items-center justify-end gap-6 pt-18 pb-8 desktop:flex">
         <div className="shrink-0 grow basis-1/2 pl-7">
           <Divider color="brand-brown" variant="circles" />
         </div>
@@ -63,12 +65,21 @@ function ResumePhoto({
         </div>
       </div>
 
-      <div className="desktop:mr-auto desktop:aspect-square desktop:grow-0 desktop:rounded-[72px] desktop:w-full desktop:h-[65.34%] desktop:overflow-hidden">
+      <div className="desktop:mr-auto desktop:aspect-square desktop:h-[65.34%] desktop:w-full desktop:grow-0 desktop:overflow-hidden desktop:rounded-[72px]">
         <div
-          className={`desktop:h-full resume-photo-bg relative z-10 h-[320px] w-full rounded-b-[30px] ${className} `}
+          className={`resume-photo-bg relative z-10 h-[320px] w-full rounded-b-[30px] desktop:h-full ${className} `}
           role="img"
         >
-          <div className="desktop:pointer-events-none desktop:block absolute inset-0 hidden">
+          <div className="offset-0 absolute ml-18 flex h-[calc(100%-17.61%)] w-[152px] items-center justify-items-center">
+            <Chalks className="hidden desktop:flex" />
+          </div>
+
+          <Heart className="absolute top-[75%] left-side tablet:top-[50%] tablet:left-[50.9%] desktop:top-[40%] desktop:left-[45%]" />
+          <Keynote className="absolute top-[50%] left-[47.8125%] tablet:top-[30%] tablet:left-[54.35%] desktop:top-[20px] desktop:left-[60%]" />
+          <Tail className="absolute top-side left-[50.9%] tablet:top-[40px] tablet:left-[58.34%] desktop:top-[23%] desktop:left-[50%]" />
+          <Melody className="absolute top-[10px] right-side tablet:top-[42px] tablet:right-[3%] tablet-lg:right-[12%] desktop:top-[20px] desktop:right-[7%]" />
+
+          <div className="absolute inset-0 hidden desktop:pointer-events-none desktop:block">
             <svg
               className="absolute right-0 bottom-0 ml-auto h-full w-full max-w-[49.79%]"
               viewBox="-10 -160 500 1000"
@@ -80,7 +91,7 @@ function ResumePhoto({
                 id="svgMei"
                 style={{
                   stroke: '#c9b08d',
-                  strokeWidth: 2,
+                  strokeWidth: 4,
                   fill: 'none',
                   strokeLinecap: 'round',
                   strokeLinejoin: 'round',
@@ -92,12 +103,7 @@ function ResumePhoto({
           </div>
 
           {/* Content overlay */}
-          <div className="tablet:px-[72px] absolute inset-0 px-6 pt-6">
-            <Heart className="left-side tablet:top-[50%] tablet:left-[50.9%] absolute top-[75%]" />
-            <Keynote className="tablet:top-[30%] tablet:left-[54.35%] absolute top-[50%] left-[47.8125%]" />
-            <Tail className="tablet:top-[40px] tablet:left-[58.34%] top-side absolute left-[50.9%]" />
-            <Melody className="tablet:top-[42px] tablet:right-[3%] tablet-lg:right-[12%] right-side absolute top-[30px]" />
-
+          <div className="absolute inset-0 px-6 pt-6 tablet:px-[72px]">
             {/* Name section */}
             <div className="desktop:hidden">
               <NameSection
@@ -107,29 +113,26 @@ function ResumePhoto({
                 fullName={fullName}
               />
             </div>
-
-            {/* Title badge */}
-            <div className="border-brand-dark mt-2 flex max-h-[46px] w-fit max-w-[81px] items-center justify-center overflow-hidden rounded-[10px] border px-3 py-2 min-[400px]:max-w-none">
-              <p className="font-sora text-brand-dark text-center text-[12px] leading-[1.26] font-bold min-[400px]:whitespace-nowrap">
-                graphic designer
-              </p>
-            </div>
+            <TitleBadge className="desktop:hidden" />
           </div>
 
-          <SoftwareApplist className="desktop:hidden tablet:bottom-[22px] tablet:left-[72px] tablet:translate-x-0 tablet:translate-y-0 tablet:justify-start absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2" />
+          <SoftwareApplist className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 tablet:bottom-[22px] tablet:left-[72px] tablet:translate-x-0 tablet:translate-y-0 tablet:justify-start desktop:hidden" />
         </div>
       </div>
 
-      <div className="desktop:flex hidden w-full shrink grow-0 basis-[17.61%]">
-        <div className="bg-brand-cream z-20 w-1/2 -translate-y-1/2 rounded-r-[45px] pt-8">
+      <div className="hidden w-full shrink grow-0 basis-[17.61%] desktop:flex">
+        <div className="relative z-20 w-1/2 shrink-0 -translate-y-1/2 rounded-r-[45px] bg-brand-cream pt-8">
           <NameSection
             firstName={firstName}
             lastName={lastName}
             fullName={fullName}
           />
         </div>
+        <div className="w-full">
+          <TitleBadge className="mt-10 h-[70px] max-h-[unset] w-full max-w-full border-3" />
+        </div>
       </div>
-      <div className="bg-brand-cream tablet:bg-brand-dark desktop:hidden absolute bottom-0 left-0 h-[178px] w-full translate-y-[28px] rounded-[30px]" />
+      <div className="absolute bottom-0 left-0 h-[178px] w-full translate-y-[28px] rounded-[30px] bg-brand-cream tablet:bg-brand-dark desktop:hidden" />
     </>
   )
 }

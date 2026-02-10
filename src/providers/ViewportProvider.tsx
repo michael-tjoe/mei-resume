@@ -9,13 +9,13 @@ interface ViewportContextValue {
 const ViewportContext = createContext<ViewportContextValue | null>(null)
 
 export function ViewportProvider({ children }: { children: React.ReactNode }) {
-  const [isDesktop, setIsDesktop] = useState(
-    () =>
-      typeof window !== 'undefined' && window.matchMedia(DESKTOP_MEDIA).matches
-  )
+  // Always start with false so server and client render the same (avoids hydration mismatch).
+  // Real value is set in useEffect after mount.
+  const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
     const mql = window.matchMedia(DESKTOP_MEDIA)
+    setIsDesktop(mql.matches)
     const handler = () => setIsDesktop(mql.matches)
     mql.addEventListener('change', handler)
     return () => mql.removeEventListener('change', handler)
