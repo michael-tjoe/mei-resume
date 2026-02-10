@@ -11,8 +11,10 @@ import NameSection from '../NameSection'
 import TitleBadge from '../TitleBadge'
 import gsap from 'gsap'
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin'
-import { useEffect } from 'react'
-import Chalks from '../Decorations/Chalks'
+import { lazy, Suspense, useEffect } from 'react'
+import { useViewport } from '../../providers/ViewportProvider'
+
+const Chalks = lazy(() => import('../Decorations/Chalks'))
 
 interface ResumePhotoProps {
   greeting?: string
@@ -30,6 +32,7 @@ function ResumePhoto({
   className = '',
 }: ResumePhotoProps) {
   const fullName = `${firstName} ${lastName}`
+  const { isDesktop } = useViewport()
 
   useEffect(() => {
     gsap.from('#svgMei', { duration: 2, drawSVG: 0 })
@@ -70,9 +73,13 @@ function ResumePhoto({
           className={`resume-photo-bg relative z-10 h-[320px] w-full rounded-b-[30px] desktop:h-full ${className} `}
           role="img"
         >
-          <div className="offset-0 absolute ml-18 flex h-[calc(100%-17.61%)] w-[152px] items-center justify-items-center">
-            <Chalks className="hidden desktop:flex" />
-          </div>
+          {isDesktop && (
+            <div className="offset-0 absolute z-20 ml-18 flex h-[calc(100%-17.61%)] w-[152px] items-center justify-center">
+              <Suspense fallback={null}>
+                <Chalks className="flex" />
+              </Suspense>
+            </div>
+          )}
 
           <Heart className="absolute top-[75%] left-side tablet:top-[50%] tablet:left-[50.9%] desktop:top-[40%] desktop:left-[45%]" />
           <Keynote className="absolute top-[50%] left-[47.8125%] tablet:top-[30%] tablet:left-[54.35%] desktop:top-[20px] desktop:left-[60%]" />
