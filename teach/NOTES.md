@@ -1,0 +1,15 @@
+# Notes
+
+- Teaching workspace root is `teach/` (not the repo root). Cursor rule: `.cursor/rules/teach-workspace.mdc`.
+- User pointed at `components/HorizontalScroll/index.tsx` lines 19–72 and asked how the effect works.
+- When asked why (own it / reuse / general ScrollTrigger), they replied “yes” — interpreted as go ahead with owning this resume component as the mission. Confirm if they later want a broader GSAP track.
+- Prefer lessons that map directly onto their two refs: `containerRef` (pinned) and `panelsRef` (translated).
+- Lesson 02 digression: user asked to learn `addEventListener` options via `hooks/useEventListener.ts` (used by horizontal scroll resize → `ScrollTrigger.refresh()`). Keep tying DOM options back to that call site; do not broaden into a full events course unless they ask.
+- Hook-only vs DOM: remind that `enabled` / `target` are not `AddEventListenerOptions`.
+
+## Hard constraint: lessons open via `file://`
+
+- Lessons are opened with `open path/to/lesson.html` (origin `null`).
+- **Never use ES modules** (`type="module"`, `import`/`export`) in lesson or asset scripts — Chrome blocks them with CORS on `file://`.
+- Use classic `<script src="../assets/….js">` plus inline non-module `<script>` that calls globals (e.g. `window.TeachQuiz`).
+- Same rule for any future interactive assets (simulators, diagrams): IIFE / `window.*` API only, no bundler required for local open.

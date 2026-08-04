@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 01 — Pin, scrub, translate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Lesson 01 · HorizontalScroll</p>
+        <h1>Pin, scrub, translate</h1>
+        <p class="lede">
+          One idea: the page still scrolls vertically; your panels only
+          <em>look</em> like they scroll sideways.
+        </p>
+        <p class="meta">~5 minutes · tied to <code>components/HorizontalScroll</code></p>
+      </header>
+
+      <h2>The trick</h2>
+      <p>
+        GSAP calls this a <strong>fake horizontal scroll</strong>: pin a section
+        so it sticks in the viewport, then scrub a tween that moves an
+        <em>inner</em> row on the <code>x</code> axis while the user keeps
+        scrolling the page normally.
+        (<a href="https://github.com/greensock/gsap-skills/blob/main/skills/gsap-scrolltrigger/SKILL.md"
+          >GreenSock’s ScrollTrigger skill</a
+        >;
+        <a href="https://gsap.com/docs/v3/Plugins/ScrollTrigger/">docs</a>)
+      </p>
+      <p>In your file that maps like this:</p>
+      <pre>main[containerRef]     → pin + trigger
+  div[panelsRef]       → gsap.to({ x: -distance })
+    children (panels)</pre>
+
+      <div class="note">
+        Official guidance: pin the wrapper; animate a child — don’t slide the
+        pinned element itself.
+      </div>
+
+      <h2>Feel it</h2>
+      <p>
+        Drag the slider as if it were the vertical scrollbar. The black frame
+        stays put (pin). The colored panels slide left (scrubbed <code>x</code>).
+      </p>
+      <div class="sim" id="sim">
+        <div class="sim-viewport">
+          <div class="sim-pin">
+            <div class="sim-track" id="track">
+              <div class="sim-panel">Cover</div>
+              <div class="sim-panel">About</div>
+              <div class="sim-panel">Work</div>
+            </div>
+          </div>
+        </div>
+        <div class="sim-controls">
+          <label for="scroll">Vertical scroll progress (scrub)</label>
+          <input id="scroll" type="range" min="0" max="100" value="0" />
+          <div class="sim-readout">
+            <span>progress: <span id="prog">0.00</span></span>
+            <span>x → left</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>What your tween is saying</h2>
+      <pre>gsap.to(panelsEl, {
+  x: () => -getScrollDistance(),   // how far left panels must travel
+  ease: "none",                    // 1:1 with scroll — required
+  scrollTrigger: {
+    trigger: container,
+    pin: true,                     // freeze container in the viewport
+    scrub: 1,                      // progress follows scroll (1s catch-up)
+    end: () => `+=${getScrollDistance()}`,
+    invalidateOnRefresh: true,
+  },
+});</pre>
+      <p>
+        <code>getScrollDistance()</code> is
+        <code>panels.scrollWidth − window.innerWidth</code>: exactly the overflow
+        that must slide into view. Matching that number in both
+        <code>x</code> and <code>end</code> keeps scroll distance and sideways
+        travel in lockstep.
+      </p>
+      <p>
+        <code>ease: "none"</code> matters. With scrub, a curved ease makes early
+        scroll move the panels unevenly — GreenSock calls this out as a common
+        mistake on fake horizontal scroll.
+      </p>
+
+      <h2>Check yourself</h2>
+      <div class="card">
+        <p style="margin-top: 0">
+          While the effect is active, what is the user actually scrolling?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Close — panels move, but native scroll is still vertical."
+          >
+            The panels element’s overflow-x scrollbar
+          </button>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Yes — pin freezes the section; scrub maps that vertical progress to x."
+          >
+            The page’s normal vertical scrollbar / wheel
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Pin stops the section from leaving; it doesn’t create sideways native scroll."
+          >
+            A horizontal scrollbar created by pin: true
+          </button>
+        </div>
+        <p class="feedback" data-feedback></p>
+      </div>
+
+      <h2>Primary source</h2>
+      <p>
+        Read the
+        <strong>Horizontal scroll (containerAnimation)</strong> section in
+        <a href="https://github.com/greensock/gsap-skills/blob/main/skills/gsap-scrolltrigger/SKILL.md"
+          >GreenSock’s official ScrollTrigger skill</a
+        >
+        (or the same ideas in the
+        <a href="https://gsap.com/docs/v3/Plugins/ScrollTrigger/">ScrollTrigger docs</a>).
+        Focus on: pin wrapper, animate child <code>x</code>, <code>ease: "none"</code>,
+        scrub.
+      </p>
+
+      <footer class="lesson-footer">
+        <p>
+          Ask me follow-ups anytime — I’m your teacher for this mission. Next we
+          can dig into why <code>end</code> must match distance, or how
+          <code>teardown</code> / resize keep React + ScrollTrigger honest.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../reference/fake-horizontal-scroll.html"
+              >Reference: fake horizontal scroll</a
+            >
+          </li>
+          <li><a href="../MISSION.md">Mission</a></li>
+          <li><a href="../RESOURCES.md">Resources</a></li>
+        </ul>
+      </footer>
+    </div>
+
+    <script src="../assets/quiz.js"></script>
+    <script>
+      TeachQuiz.wireAllQuizzes();
+
+      var sim = document.getElementById("sim");
+      var input = document.getElementById("scroll");
+      var prog = document.getElementById("prog");
+
+      function update() {
+        var p = Number(input.value) / 100;
+        sim.style.setProperty("--progress", String(p));
+        prog.textContent = p.toFixed(2);
+      }
+
+      input.addEventListener("input", update);
+      update();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,275 @@
+:root {
+  --bg: #f7f4ef;
+  --ink: #1a1a1a;
+  --muted: #5c5c5c;
+  --line: #d9d2c7;
+  --accent: #0b5fff;
+  --ok: #1b7f4a;
+  --bad: #b42318;
+  --card: #fffdf9;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --serif: "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
+  --sans: "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 18px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top right, rgba(11, 95, 255, 0.06), transparent 40%),
+    linear-gradient(180deg, #fbfaf7 0%, var(--bg) 100%);
+  font-family: var(--serif);
+  line-height: 1.55;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.wrap {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+header.site {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.kicker {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+  margin: 0 0 0.6rem;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 2.25rem 0 0.75rem;
+  font-weight: 600;
+}
+
+p,
+li {
+  color: var(--ink);
+}
+
+.lede {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.meta {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.75rem;
+}
+
+code,
+.mono {
+  font-family: var(--mono);
+  font-size: 0.86em;
+}
+
+pre {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.note {
+  border-left: 3px solid var(--accent);
+  padding: 0.2rem 0 0.2rem 0.9rem;
+  margin: 1.25rem 0;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1.25rem 0;
+}
+
+.quiz {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.quiz button {
+  font: inherit;
+  font-family: var(--sans);
+  text-align: left;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.quiz button:hover {
+  border-color: var(--accent);
+}
+
+.quiz button[data-state="correct"] {
+  border-color: var(--ok);
+  background: #eaf7ef;
+}
+
+.quiz button[data-state="wrong"] {
+  border-color: var(--bad);
+  background: #fdeceb;
+}
+
+.feedback {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  min-height: 1.4em;
+  margin: 0.4rem 0 0;
+}
+
+.feedback.ok {
+  color: var(--ok);
+}
+
+.feedback.bad {
+  color: var(--bad);
+}
+
+.sim {
+  --progress: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  overflow: hidden;
+  margin: 1rem 0 0.5rem;
+}
+
+.sim-viewport {
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #333;
+}
+
+.sim-pin {
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed #666;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sim-pin::before {
+  content: "pinned container";
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  color: #9aa;
+  z-index: 2;
+}
+
+.sim-track {
+  display: flex;
+  height: 100%;
+  width: 300%;
+  transform: translateX(calc(var(--progress) * -66.666%));
+  transition: transform 80ms linear;
+}
+
+.sim-panel {
+  flex: 0 0 33.333%;
+  display: grid;
+  place-items: center;
+  font-family: var(--sans);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.sim-panel:nth-child(1) {
+  background: #1f4b99;
+}
+.sim-panel:nth-child(2) {
+  background: #0f6b4c;
+}
+.sim-panel:nth-child(3) {
+  background: #8a3b12;
+}
+
+.sim-controls {
+  padding: 0.85rem 1rem 1rem;
+  font-family: var(--sans);
+}
+
+.sim-controls label {
+  display: block;
+  font-size: 0.8rem;
+  color: #bbb;
+  margin-bottom: 0.4rem;
+}
+
+.sim-controls input[type="range"] {
+  width: 100%;
+}
+
+.sim-readout {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #9aa;
+  margin-top: 0.45rem;
+  font-family: var(--mono);
+}
+
+footer.lesson-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+}

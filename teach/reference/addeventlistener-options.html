@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference — addEventListener options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Reference · DOM</p>
+        <h1>addEventListener options</h1>
+        <p class="lede">
+          Cheat sheet for the options object your hook forwards in
+          <code>hooks/useEventListener.ts</code>.
+        </p>
+      </header>
+
+      <pre>element.addEventListener(type, listener, {
+  capture,  // boolean — listen during capture phase (default false)
+  once,     // boolean — auto-remove after first call (default false)
+  passive,  // boolean — promise never to call preventDefault()
+  signal,   // AbortSignal — remove when controller.abort()
+});</pre>
+
+      <h2>Option → meaning</h2>
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>If true…</th>
+            <th>In your hook</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>capture</code></td>
+            <td>Runs on the way <em>down</em> the tree (before descendants).</td>
+            <td>Passed through; also needed for <code>removeEventListener</code>.</td>
+          </tr>
+          <tr>
+            <td><code>once</code></td>
+            <td>Fires at most once, then browser removes it.</td>
+            <td>Passed through; cleanup still safe.</td>
+          </tr>
+          <tr>
+            <td><code>passive</code></td>
+            <td>You will not cancel the event; browser can scroll ASAP.</td>
+            <td>Used as <code>true</code> for resize in <code>useHorizontalScroll</code>.</td>
+          </tr>
+          <tr>
+            <td><code>signal</code></td>
+            <td>Listener dies when that <code>AbortSignal</code> aborts.</td>
+            <td>Passed through; React effect cleanup is the usual teardown.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note">
+        Hook-only options: <code>target</code> and <code>enabled</code> are
+        <strong>not</strong> DOM options — they control where/whether the hook
+        attaches. See
+        <a href="../lessons/0002-addeventlistener-options.html">Lesson 02</a>.
+      </div>
+
+      <h2>removeEventListener match keys</h2>
+      <p>
+        Per
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener"
+          >MDN</a
+        >, removal matches <code>type</code> + <code>listener</code> +
+        <code>capture</code>. <code>once</code> / <code>passive</code> /
+        <code>signal</code> are not part of the identity.
+      </p>
+      <pre>// your hook cleanup
+element.removeEventListener(eventName, listener, capture);</pre>
+
+      <h2>When to set passive</h2>
+      <ul>
+        <li>
+          Prefer <code>passive: true</code> for scroll / wheel / touch / resize
+          handlers that only <em>observe</em> (never <code>preventDefault</code>).
+        </li>
+        <li>
+          Spec default is <code>false</code>; some browsers default wheel/touch
+          on document-level nodes to <code>true</code> — set explicitly when it
+          matters.
+          (<a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#using_passive_listeners"
+            >MDN</a
+          >)
+        </li>
+      </ul>
+
+      <footer class="lesson-footer">
+        <p>Primary source:</p>
+        <ul class="links">
+          <li>
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"
+              >MDN — addEventListener</a
+            >
+          </li>
+          <li>
+            <a href="../lessons/0002-addeventlistener-options.html">Lesson 02</a>
+          </li>
+        </ul>
+      </footer>
+    </div>
+    <style>
+      .ref-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--sans);
+        font-size: 0.88rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .ref-table th,
+      .ref-table td {
+        border: 1px solid var(--line);
+        padding: 0.55rem 0.65rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      .ref-table th {
+        background: var(--card);
+        font-weight: 600;
+      }
+      .ref-table code {
+        white-space: nowrap;
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+---
+description: Keep /teach skill files under teach/ and file://-safe scripts
+alwaysApply: true
+---
+
+# Teaching workspace (`/teach`)
+
+When using the teach skill in this repo:
+
+- Put **all** teaching artifacts under `teach/` (not the repo root):
+  - `teach/MISSION.md`, `teach/RESOURCES.md`, `teach/NOTES.md`
+  - `teach/lessons/`, `teach/reference/`, `teach/learning-records/`, `teach/assets/`
+- Treat `teach/` as the teaching workspace root for relative links and new files.
+
+## Lesson scripts must work on `file://`
+
+Lessons are opened with `open teach/lessons/….html` (origin `null`).
+
+- **Do not** use ES modules (`type="module"`, `import`/`export`) in lesson or `teach/assets` scripts — Chrome CORS-blocks them on `file://`.
+- Use classic `<script src="../assets/….js">` and non-module inline scripts that call globals (e.g. `window.TeachQuiz`).

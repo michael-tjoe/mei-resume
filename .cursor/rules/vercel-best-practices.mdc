@@ -1,0 +1,12 @@
+---
+description: Always apply Vercel React best practices skill on this repo
+alwaysApply: true
+---
+
+# Vercel React best practices
+
+For any task in this repo that involves writing, reviewing, refactoring, or optimizing React/Next.js code (components, pages, data fetching, bundles, rendering):
+
+1. **Read and follow** the `vercel-react-best-practices` skill before implementing.
+2. Prefer its guidance over ad-hoc patterns when they conflict.
+3. Apply high-impact categories first (waterfalls, bundle size, server performance) when relevant.
