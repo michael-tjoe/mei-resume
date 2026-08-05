@@ -3,7 +3,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import BrandLogo from '@/components/BrandLogo/BrandLogo';
+import TypographyArt from '@/components/TypographyArt';
 import { useHorizontalScrollApi } from '@/components/HorizontalScroll';
 import { prefersReducedMotion } from '@/helpers/prefersReducedMotion';
 import { loadGsap } from '@/hooks/loadGsap';
@@ -28,7 +28,7 @@ const closeImage = (
   <Image src={icClose} alt="" width={52} height={52} unoptimized className="size-full" />
 );
 
-const brandLogo = <BrandLogo text="stefanny’s" rotate={-7.03} left={51} />;
+const typographyArt = <TypographyArt text="stefanny’s" rotate={-7.03} left={51} />;
 
 const glovesImage = (
   <Image src={gloves} alt="" width={198} height={180} className="size-full" aria-hidden />
@@ -179,7 +179,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
             className="cursor-pointer pt-12 pl-16 transition-opacity hover:opacity-80"
             aria-label="Back to top"
           >
-            {brandLogo}
+            {typographyArt}
           </button>
 
           <nav

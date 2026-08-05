@@ -4,6 +4,7 @@ interface SectionTitleProps {
   text: string;
   className?: string;
   invert?: boolean;
+  id?: string;
 }
 
 /** Prefer theme classes over inline style writes (js-batch-dom-css). */
@@ -15,9 +16,12 @@ const COLOR_CLASS = {
 /** Hoisted base classes — avoid reallocating the utility string (rendering-hoist-jsx). */
 const BASE_CLASS = 'text-left text-portofolio-title';
 
-function SectionTitle({ text, className, invert = false }: SectionTitleProps) {
+function SectionTitle({ text, className, invert = false, id }: SectionTitleProps) {
   return (
-    <h1 className={cn(BASE_CLASS, invert ? COLOR_CLASS.invert : COLOR_CLASS.default, className)}>
+    <h1
+      id={id}
+      className={cn(BASE_CLASS, invert ? COLOR_CLASS.invert : COLOR_CLASS.default, className)}
+    >
       {text}
     </h1>
   );

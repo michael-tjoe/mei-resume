@@ -3,7 +3,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import gsap from 'gsap';
-import BrandLogo from '@/components/BrandLogo/BrandLogo';
+import TypographyArt from '@/components/TypographyArt';
 import { prefersReducedMotion } from '@/helpers/prefersReducedMotion';
 
 interface MobileNavbarMenuProps {
@@ -15,7 +15,7 @@ const navItems = [
   { label: 'experiences', href: '#experiences' },
   {
     label: 'portfolio',
-    href: '#portfolio',
+    href: '#portofolio',
     subItems: [
       { label: 'social media design', href: '#social-media' },
       { label: 'UI/UX design', href: '#uiux' },
@@ -45,7 +45,7 @@ const closeIcon = (
   </svg>
 );
 
-const brandLogo = <BrandLogo text="stefanny’s" rotate={-7.03} left={51} />;
+const typographyArt = <TypographyArt text="stefanny’s" rotate={-7.03} left={51} />;
 
 function MobileNavbarMenu({ isOpen, onClose }: MobileNavbarMenuProps) {
   const [shouldRender, setShouldRender] = useState(false);
@@ -161,7 +161,17 @@ function MobileNavbarMenu({ isOpen, onClose }: MobileNavbarMenuProps) {
           {closeIcon}
         </button>
 
-        <div className="flex justify-center pt-10">{brandLogo}</div>
+        <button
+          type="button"
+          onClick={() => {
+            onClose();
+            window.scrollTo({ top: 0 });
+          }}
+          className="flex w-full cursor-pointer justify-center pt-10 transition-opacity hover:opacity-80"
+          aria-label="About me"
+        >
+          {typographyArt}
+        </button>
 
         <nav className="mt-8 flex flex-col items-center" aria-label="Mobile">
           {navItems.map((item) => (

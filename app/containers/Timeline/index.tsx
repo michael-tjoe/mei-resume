@@ -9,14 +9,19 @@ import ViewWorksButton from './components/ViewWorksButton';
 /** Hoisted static JSX (rendering-hoist-jsx). */
 const mobileTitle = (
   <MobileOnly>
-    <SectionTitle className="px-side" text="experiences" />
+    <SectionTitle
+      id="experiences"
+      className="scroll-mt-[calc(var(--spacing)*12.25+16px)] px-side"
+      text="experiences"
+    />
   </MobileOnly>
 );
 
 const desktopTitle = (
   <DesktopOnly>
     <SectionTitle
-      className="mx-auto mt-[calc(93/1920*100vh)] mb-[calc(140/1920*100vh)] timeline-h-1080:mt-[calc(93/1080*100vh)] timeline-h-1080:mb-[calc(140/1080*100vh)] [@media(max-height:960px)]:mt-[calc(93/2440*100vh)] [@media(max-height:960px)]:mb-[calc(140/2440*100vh)]"
+      id="experiences"
+      className="mx-auto mt-[calc(93/1920*100vh)] mb-[calc(140/1920*100vh)] scroll-mt-12.25 desktop:scroll-mt-0 timeline-h-1080:mt-[calc(93/1080*100vh)] timeline-h-1080:mb-[calc(140/1080*100vh)] [@media(max-height:960px)]:mt-[calc(93/2440*100vh)] [@media(max-height:960px)]:mb-[calc(140/2440*100vh)]"
       text="experiences"
     />
   </DesktopOnly>
@@ -24,10 +29,7 @@ const desktopTitle = (
 
 export default function Timeline() {
   return (
-    <section
-      id="experiences"
-      className="relative flex w-full flex-col pt-4 desktop:@container-size/timeline desktop:h-screen desktop:w-[3175px] desktop:shrink-0 desktop:px-24 desktop:pt-14 desktop:[@media(max-height:960px)]:pt-5"
-    >
+    <section className="relative flex w-full flex-col pt-4 desktop:@container-size/timeline desktop:h-screen desktop:w-[3175px] desktop:shrink-0 desktop:px-24 desktop:pt-14 desktop:[@media(max-height:960px)]:pt-5">
       <DesktopOnly>
         <Divider className="mb-5 shrink-0" color="brand-brown" variant="single-centered-circle" />
         <Divider
@@ -67,7 +69,7 @@ export default function Timeline() {
         <MobileBackgroundLayer className="absolute -bottom-3.75 left-0 z-30 h-7.5 w-full translate-y-0 rounded-b-[30px] bg-brand-cream tablet:bg-brand-cream" />
       </MobileOnly>
       <MobileOnly>
-        <MobileBackgroundLayer className="absolute -bottom-20 left-0 z-10 translate-y-0 bg-brand-dark tablet:bg-brand-dark" />
+        <MobileBackgroundLayer className="absolute -bottom-20 left-0 z-10 translate-y-0 bg-brand-dark tablet:bg-brand-dark scroll-mt-[calc(var(--spacing)*12.25-80px)]" />
       </MobileOnly>
     </section>
   );

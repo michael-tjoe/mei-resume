@@ -35,6 +35,7 @@ import gebrak7 from './assets/gebrak/feed-7.jpg';
 import gebrak8 from './assets/gebrak/feed-8.jpg';
 import gebrak9 from './assets/gebrak/feed-9.jpg';
 import { MobileOnly } from '@/components/MobileOnly';
+import { DesktopOnly } from '@/components/DesktopOnly';
 
 /** Hoisted static galleries (rendering-hoist-jsx / server-hoist-static-io). */
 const MASINDO_FEEDS: StaticImageData[] = [
@@ -125,8 +126,18 @@ function FeedSlider({ feeds }: { feeds: StaticImageData[] }) {
 
 export default function Portofolio() {
   return (
-    <section id="portofolio" className="relative z-30 w-full pb-14">
-      <SectionTitle invert className="px-side pt-[40px] pb-5" text="portfolio" />
+    <section className="relative z-30 min-h-[2000px] w-full pb-14">
+      <DesktopOnly>
+        <SectionTitle id="portofolio" invert className="px-side pt-10 pb-5" text="portfolio" />
+      </DesktopOnly>
+      <MobileOnly>
+        <SectionTitle
+          id="portofolio"
+          text="portfolio"
+          invert
+          className="scroll-mt-[calc(var(--spacing)*12.25-20px)] px-side pt-10 pb-5"
+        />
+      </MobileOnly>
 
       <MobileOnly>
         <div className="pt-3 [&>div:not(:last-child)]:mb-7">
