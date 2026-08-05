@@ -66,6 +66,12 @@
   --animate-flower-scale: flower-scale 600ms ease-in-out infinite;
 }
 
+/* Short timeline (≤960px): use 2440 design proportion for spacing. */
+@custom-variant timeline-h-960 (@container timeline (max-height: 960px));
+
+/* Tall timeline (≥1080 design + pt-14/56px): use 1080 design proportion for spacing. */
+@custom-variant timeline-h-1080 (@container timeline (min-height: 1136px));
+
 @keyframes flower-scale {
   0%,
   100% {
@@ -99,6 +105,9 @@
 
     --text-portofolio-body: 20px;
     --text-portofolio-body--line-height: 25px;
+
+    --text-portofolio-subtitle: 32px;
+    --text-portofolio-subtitle--line-height: 40px;
   }
 }
 
