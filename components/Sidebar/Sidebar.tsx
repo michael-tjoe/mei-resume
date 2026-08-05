@@ -4,6 +4,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import BrandLogo from '@/components/BrandLogo/BrandLogo';
+import { useHorizontalScrollApi } from '@/components/HorizontalScroll';
 import { prefersReducedMotion } from '@/helpers/prefersReducedMotion';
 import { loadGsap } from '@/hooks/loadGsap';
 import gloves from './assets/gloves.png';
@@ -15,7 +16,7 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { label: 'experiences', href: '#experiences' },
+  { label: 'experiences', href: '#experiences', scrollY: 2420 },
   { label: 'portfolio', href: '#portfolio' },
   { label: 'contact', href: '#contact' },
 ] as const;
@@ -34,6 +35,7 @@ const glovesImage = (
 );
 
 function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { scrollTo } = useHorizontalScrollApi();
   const [shouldRender, setShouldRender] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -168,7 +170,17 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
             </button>
           </div>
 
-          <div className="pt-12 pl-16">{brandLogo}</div>
+          <button
+            type="button"
+            onClick={() => {
+              scrollTo(0);
+              onClose();
+            }}
+            className="cursor-pointer pt-12 pl-16 transition-opacity hover:opacity-80"
+            aria-label="Back to top"
+          >
+            {brandLogo}
+          </button>
 
           <nav
             className="mt-[calc(100vh*64/1080)] flex flex-col gap-[calc(100vh*36/1080)] pl-16"
@@ -178,7 +190,13 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
               <a
                 key={item.label}
                 href={item.href}
-                onClick={onClose}
+                onClick={(event) => {
+                  if ('scrollY' in item) {
+                    event.preventDefault();
+                    scrollTo(item.scrollY);
+                  }
+                  onClose();
+                }}
                 className="font-sora text-[32px] leading-normal font-bold text-white transition-opacity hover:opacity-80"
               >
                 {item.label}

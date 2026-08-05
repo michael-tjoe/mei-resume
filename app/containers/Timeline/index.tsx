@@ -7,7 +7,7 @@ import ViewWorksButton from './components/ViewWorksButton';
 export default function Timeline() {
   return (
     <section
-      id="#experiences"
+      id="experiences"
       className="relative flex w-full flex-col px-side pt-4 desktop:@container-size/timeline desktop:h-screen desktop:w-[3175px] desktop:shrink-0 desktop:px-24 desktop:pt-14 desktop:[@media(max-height:960px)]:pt-5"
     >
       <DesktopOnly>
