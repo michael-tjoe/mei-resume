@@ -70,7 +70,7 @@
 @custom-variant timeline-h-960 (@container timeline (max-height: 960px));
 
 /* Tall timeline (≥1080 design + pt-14/56px): use 1080 design proportion for spacing. */
-@custom-variant timeline-h-1080 (@container timeline (min-height: 1136px));
+@custom-variant timeline-h-1080 (@container timeline (min-height: 1920px));
 
 @keyframes flower-scale {
   0%,
