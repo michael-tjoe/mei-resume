@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useEffectEvent, useRef } from 'react';
+import { prefersReducedMotion } from '@/helpers/prefersReducedMotion';
 import { loadGsap, type Gsap } from '@/hooks/loadGsap';
 import { cancelIdle, scheduleIdle } from '@/hooks/scheduleIdle';
 
@@ -20,9 +21,7 @@ export function useIdleGsapAnimation(animate: IdleGsapAnimate) {
     const el = ref.current;
     if (!el) return;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return;
-    }
+    if (prefersReducedMotion()) return;
 
     let cancelled = false;
     let revert: (() => void) | undefined;

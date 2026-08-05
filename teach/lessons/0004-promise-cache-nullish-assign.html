@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 04 — Promise cache with ??=</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <style>
+      .cache-sim {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--card);
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: var(--sans);
+      }
+      .cache-sim .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        align-items: center;
+      }
+      .cache-sim button {
+        font: inherit;
+        font-family: var(--sans);
+        padding: 0.55rem 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+      }
+      .cache-sim button:hover {
+        border-color: var(--accent);
+      }
+      .cache-sim button.primary {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+      .cache-sim .status {
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        padding: 0.65rem 0.75rem;
+        border-radius: 6px;
+        background: #111;
+        color: #e8e4dc;
+        width: 100%;
+      }
+      .cache-sim .log {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        line-height: 1.45;
+        max-height: 9rem;
+        overflow-y: auto;
+        color: var(--muted);
+        margin: 0;
+        white-space: pre-wrap;
+      }
+      .cache-sim .log .new {
+        color: var(--accent);
+      }
+      .cache-sim .log .hit {
+        color: var(--ok);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Lesson 04 · loadMorphGsap</p>
+        <h1>Promise cache with <code>??=</code></h1>
+        <p class="lede">
+          One idea: the first call starts the MorphSVG import; every later call
+          reuses the <em>same</em> Promise — that is what line 13’s
+          <code>??=</code> does.
+        </p>
+        <p class="meta">
+          ~5 minutes · tied to
+          <code>loadMorphGsap.ts</code> lines 5–20
+        </p>
+      </header>
+
+      <h2>The line</h2>
+      <pre>morphGsapPromise ??= Promise.all([
+  loadGsap(),
+  import('gsap/MorphSVGPlugin'),
+]).then(/* register + return gsap */);</pre>
+      <p>
+        <code>??=</code> is
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment"
+          >nullish coalescing assignment</a
+        >: assign the right-hand side <strong>only if</strong> the left is
+        <code>null</code> or <code>undefined</code>. If the left already holds
+        a Promise, the right side is <em>not evaluated at all</em>
+        (short-circuit) — so no second dynamic import.
+      </p>
+      <div class="note">
+        Same idea as
+        <code>if (morphGsapPromise == null) morphGsapPromise = …</code>, but
+        one expression. Not the same as <code>||=</code>, which would also
+        overwrite other falsy values.
+      </div>
+
+      <h2>Why cache a Promise, not the result?</h2>
+      <p>
+        Caching the Promise means overlapping first calls (enter on Game + Mic
+        before load finishes) all <code>await</code> / <code>.then</code> the
+        <em>same in-flight work</em>. Caching only after resolve would let two
+        early callers each start a fresh <code>import()</code>.
+      </p>
+      <p>
+        Module-level <code>let morphGsapPromise</code> lives for the whole
+        Chalks chunk lifetime — Game, Mic, and Paint share one load
+        (<a href="https://gsap.com/resources/Plugins/">register plugin once</a>).
+      </p>
+
+      <h2>Feel it</h2>
+      <p>
+        Spam <strong>Call loadMorphGsap()</strong>. With the cache on, only the
+        first click starts a fake import; later clicks hit the same Promise.
+      </p>
+      <div class="cache-sim" id="sim">
+        <div class="row">
+          <div class="status" id="status">
+            cache: null · imports started: 0 · resolved: no
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="primary" id="btn-call">
+            Call loadMorphGsap()
+          </button>
+          <button type="button" id="btn-reset">Reset cache</button>
+          <label style="font-size: 0.85rem; color: var(--muted)">
+            <input type="checkbox" id="use-cache" checked />
+            use ??= cache
+          </label>
+        </div>
+        <pre class="log" id="log"></pre>
+      </div>
+
+      <h2>How this ties to Lesson 03</h2>
+      <p>
+        Sharing one Promise is good for the bundle. It does
+        <em>not</em> remove the enter/leave race —
+        <a href="./0003-stale-async-hover-race.html">Lesson 03</a>’s
+        <code>loadGenRef</code> still needed because many
+        <code>morph()</code> calls can wait on that one load and must decide
+        who is allowed to animate when it resolves.
+      </p>
+
+      <h2>Check yourself</h2>
+      <div class="card">
+        <p style="margin-top: 0">
+          <code>morphGsapPromise</code> already holds an in-flight Promise.
+          What does the next <code>loadMorphGsap()</code> call do at line 13?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="??= short-circuits — the import on the right never runs."
+          >
+            Start a second MorphSVG dynamic import
+          </button>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Right — left is not nullish, so ??= skips the right-hand side."
+          >
+            Skip the right side; reuse that Promise
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="It returns the cached Promise; it does not clear the cache."
+          >
+            Set the cache back to null and wait
+          </button>
+          <p data-feedback class="feedback"></p>
+        </div>
+      </div>
+
+      <h2>Primary source</h2>
+      <p>
+        Read
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment"
+          >MDN: Nullish coalescing assignment (<code>??=</code>)</a
+        >
+        — especially the short-circuit note that the right operand is not
+        evaluated when the left is already set.
+      </p>
+
+      <footer class="lesson-footer">
+        <p>
+          Ask follow-ups in chat — <code>Promise.all</code>, why
+          <code>import()</code> is dynamic, or how this interacts with the
+          generation guard.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="./0003-stale-async-hover-race.html"
+              >Lesson 03 — Stale async hover race</a
+            >
+          </li>
+          <li>
+            <a href="../reference/use-morph-svg-hover.html"
+              >Reference: useMorphSvgHover</a
+            >
+          </li>
+          <li>
+            <a
+              href="../../app/containers/ResumeCover/components/ResumePhoto/components/Chalks/loadMorphGsap.ts"
+              ><code>loadMorphGsap.ts</code></a
+            >
+          </li>
+        </ul>
+      </footer>
+    </div>
+
+    <script src="../assets/quiz.js"></script>
+    <script>
+      (function () {
+        window.TeachQuiz.wireAllQuizzes();
+
+        var cache = null;
+        var importsStarted = 0;
+        var resolved = false;
+        var callN = 0;
+
+        var statusEl = document.getElementById("status");
+        var logEl = document.getElementById("log");
+        var useCache = document.getElementById("use-cache");
+
+        function paint() {
+          statusEl.textContent =
+            "cache: " +
+            (cache ? "Promise" : "null") +
+            " · imports started: " +
+            importsStarted +
+            " · resolved: " +
+            (resolved ? "yes" : "no");
+        }
+
+        function log(msg, cls) {
+          var line = document.createElement("div");
+          if (cls) line.className = cls;
+          line.textContent = msg;
+          logEl.appendChild(line);
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function loadMorphGsap() {
+          callN += 1;
+          var id = callN;
+
+          if (useCache.checked) {
+            if (cache == null) {
+              importsStarted += 1;
+              log("#" + id + " ??= assigned — started import", "new");
+              cache = new Promise(function (resolve) {
+                setTimeout(function () {
+                  resolved = true;
+                  paint();
+                  resolve("gsap");
+                  log("#" + id + " import resolved (shared)", "hit");
+                }, 700);
+              });
+            } else {
+              log("#" + id + " ??= skipped — reused Promise", "hit");
+            }
+            paint();
+            return cache;
+          }
+
+          importsStarted += 1;
+          log("#" + id + " no cache — started import", "new");
+          paint();
+          return new Promise(function (resolve) {
+            setTimeout(function () {
+              resolved = true;
+              paint();
+              resolve("gsap");
+              log("#" + id + " import resolved", "hit");
+            }, 700);
+          });
+        }
+
+        document.getElementById("btn-call").addEventListener("click", function () {
+          loadMorphGsap();
+        });
+        document.getElementById("btn-reset").addEventListener("click", function () {
+          cache = null;
+          importsStarted = 0;
+          resolved = false;
+          callN = 0;
+          logEl.textContent = "";
+          paint();
+          log("reset");
+        });
+
+        paint();
+      })();
+    </script>
+  </body>
+</html>

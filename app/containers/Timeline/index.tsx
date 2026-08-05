@@ -1,5 +1,5 @@
 import SectionTitle from '@/components/SectionTitle';
-import TimelineList from '@/components/Timeline';
+import TimelineList from './components/TimelineList';
 
 export default function Timeline() {
   return (

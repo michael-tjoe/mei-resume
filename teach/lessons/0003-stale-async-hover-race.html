@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 03 — Stale async hover race</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <style>
+      .race-sim {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--card);
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: var(--sans);
+      }
+      .race-sim .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        align-items: center;
+      }
+      .race-sim button {
+        font: inherit;
+        font-family: var(--sans);
+        padding: 0.55rem 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+      }
+      .race-sim button:hover {
+        border-color: var(--accent);
+      }
+      .race-sim button.primary {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+      .race-sim label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .race-sim .status {
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        padding: 0.65rem 0.75rem;
+        border-radius: 6px;
+        background: #111;
+        color: #e8e4dc;
+        margin-bottom: 0.65rem;
+      }
+      .race-sim .status[data-shape="final"] {
+        box-shadow: inset 4px 0 0 #0b5fff;
+      }
+      .race-sim .status[data-shape="original"] {
+        box-shadow: inset 4px 0 0 #1b7f4a;
+      }
+      .race-sim .log {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        line-height: 1.45;
+        max-height: 9.5rem;
+        overflow-y: auto;
+        color: var(--muted);
+        margin: 0;
+        white-space: pre-wrap;
+      }
+      .race-sim .log .stale {
+        color: var(--bad);
+      }
+      .race-sim .log .ok {
+        color: var(--ok);
+      }
+      .chalk-preview {
+        width: 72px;
+        height: 56px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        transition: background 0.35s ease, color 0.35s ease;
+      }
+      .chalk-preview[data-shape="original"] {
+        background: #faf3e7;
+        color: #321000;
+      }
+      .chalk-preview[data-shape="final"] {
+        background: #321000;
+        color: #faf3e7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Lesson 03 · useMorphSvgHover</p>
+        <h1>Stale async hover race</h1>
+        <p class="lede">
+          One idea: when MorphSVG loads <em>after</em> enter/leave, older
+          promises must not win — that is what
+          <code>loadGenRef</code> + <code>hoveredRef</code> enforce.
+        </p>
+        <p class="meta">
+          ~6 minutes · tied to
+          <code>useMorphSvgHover.ts</code> lines 81–101
+        </p>
+      </header>
+
+      <h2>Why this hook exists</h2>
+      <p>
+        Chalk icons (Game, Mic, Paint) morph SVG paths on hover via
+        <a href="https://gsap.com/docs/v3/Plugins/MorphSVGPlugin/"
+          >MorphSVGPlugin</a
+        >. The plugin is loaded only on first hover through
+        <code>loadMorphGsap()</code> so MorphSVG stays out of the initial
+        bundle
+        (<a href="https://gsap.com/resources/Plugins/">GSAP plugins are
+          opt-in</a
+        >). Hover is a user interaction, so the morph lives in event handlers —
+        not in an Effect that would re-run on unrelated renders
+        (<a href="https://react.dev/learn/separating-events-from-effects"
+          >Separating Events from Effects</a
+        >).
+      </p>
+      <div class="note">
+        Full hook map (refs, return value, effects):
+        <a href="../reference/use-morph-svg-hover.html"
+          >reference — useMorphSvgHover</a
+        >.
+      </div>
+
+      <h2>The bug without a generation</h2>
+      <p>
+        <code>loadMorphGsap()</code> returns a Promise. Enter and leave can
+        both fire before the first import resolves. Without a guard, this
+        happens:
+      </p>
+      <pre>enter → start load (want final)
+leave → start load (want original)   // still waiting…
+enter’s then() resolves → morphs to final   // WRONG: mouse already left
+leave’s then() resolves → morphs to original</pre>
+      <p>
+        Your pointer is outside, but an older “enter” callback still animates
+        to the hover shape. That is a classic stale async race.
+      </p>
+
+      <h2>What your <code>morph</code> does</h2>
+      <pre>hoveredRef.current = wantHover;
+const gen = ++loadGenRef.current;
+
+void loadMorphGsap().then((gsap) => {
+  if (gen !== loadGenRef.current) return;       // newer call superseded us
+  if (hoveredRef.current !== wantHover) return; // desire flipped mid-flight
+  // … kill tweens, run animateFinal or animateOriginal
+});</pre>
+      <p>
+        Each call stamps a new generation. When a promise settles, it only
+        animates if it is still the latest stamp <em>and</em> the desired hover
+        flag still matches what that call asked for. See the source:
+        <a
+          href="../../app/containers/ResumeCover/components/ResumePhoto/components/Chalks/useMorphSvgHover.ts"
+          ><code>useMorphSvgHover.ts</code></a
+        >.
+      </p>
+
+      <h2>Feel the race</h2>
+      <p>
+        Click <strong>Enter</strong> then immediately <strong>Leave</strong>
+        while the fake “import” is still pending (default 900&nbsp;ms). Toggle
+        the guard and watch whether a stale enter can still paint the hover
+        shape.
+      </p>
+      <div class="race-sim" id="race">
+        <div class="row">
+          <div
+            class="chalk-preview"
+            id="preview"
+            data-shape="original"
+            aria-hidden="true"
+          >
+            chalk
+          </div>
+          <div class="status" id="status" data-shape="original">
+            shape: original · pending: 0 · gen: 0
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="primary" id="btn-enter">Enter</button>
+          <button type="button" id="btn-leave">Leave</button>
+          <button type="button" id="btn-reset">Reset</button>
+          <label>
+            <input type="checkbox" id="guard" checked />
+            use generation guard
+          </label>
+          <label>
+            delay
+            <input
+              type="range"
+              id="delay"
+              min="200"
+              max="1500"
+              step="100"
+              value="900"
+            />
+            <span id="delay-label">900ms</span>
+          </label>
+        </div>
+        <pre class="log" id="log"></pre>
+      </div>
+
+      <h2>Two cheap checks before the expensive work</h2>
+      <p>
+        Before even kicking the import,
+        <code>prefersReducedMotion()</code> returns early
+        (<a
+          href="https://www.w3.org/WAI/WCAG22/Techniques/client-side-script/SCR40"
+          >WCAG SCR40</a
+        >;
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+          >MDN</a
+        >). That is intentional: never start an async MorphSVG load for users
+        who asked for less motion.
+      </p>
+
+      <h2>Check yourself</h2>
+      <div class="card">
+        <p style="margin-top: 0">
+          Mouse leaves while an enter-load is still pending. With the guard
+          on, what should happen when that enter promise finally resolves?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="That would ignore hoveredRef — the mouse already left."
+          >
+            Morph to the final hover shape anyway
+          </button>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Right — gen or hoveredRef fails, so the stale enter is ignored."
+          >
+            Bail out; leave the original shape alone
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Cleanup kills on unmount; this race is about mid-hover load."
+          >
+            Unmount the chalk and kill every tween
+          </button>
+          <p data-feedback class="feedback"></p>
+        </div>
+      </div>
+
+      <h2>Primary source</h2>
+      <p>
+        Read
+        <a href="https://react.dev/learn/separating-events-from-effects"
+          >React: Separating Events from Effects</a
+        >
+        — why hover morph belongs in handlers, and why “latest desire” must be
+        checked when async work finishes. Pair with the
+        <a href="https://gsap.com/docs/v3/Plugins/MorphSVGPlugin/"
+          >MorphSVGPlugin docs</a
+        >
+        for what the animate callbacks actually tween.
+      </p>
+
+      <footer class="lesson-footer">
+        <p>
+          Ask follow-up questions in chat — unclear lines, another race case,
+          or how <code>animateFinalRef</code> stays fresh. I’m your teacher for
+          this.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../reference/use-morph-svg-hover.html"
+              >Reference: useMorphSvgHover</a
+            >
+          </li>
+          <li>
+            <a href="./0002-addeventlistener-options.html"
+              >Lesson 02 — addEventListener options</a
+            >
+          </li>
+          <li>
+            <a href="./0001-pin-scrub-translate.html"
+              >Lesson 01 — Pin, scrub, translate</a
+            >
+          </li>
+        </ul>
+      </footer>
+    </div>
+
+    <script src="../assets/quiz.js"></script>
+    <script>
+      (function () {
+        window.TeachQuiz.wireAllQuizzes();
+
+        var loadGen = 0;
+        var hovered = false;
+        var pending = 0;
+        var shape = "original";
+        var timers = [];
+
+        var preview = document.getElementById("preview");
+        var statusEl = document.getElementById("status");
+        var logEl = document.getElementById("log");
+        var guardEl = document.getElementById("guard");
+        var delayEl = document.getElementById("delay");
+        var delayLabel = document.getElementById("delay-label");
+
+        function delayMs() {
+          return Number(delayEl.value);
+        }
+
+        function setShape(next) {
+          shape = next;
+          preview.setAttribute("data-shape", next);
+          statusEl.setAttribute("data-shape", next);
+          paintStatus();
+        }
+
+        function paintStatus() {
+          statusEl.textContent =
+            "shape: " +
+            shape +
+            " · pending: " +
+            pending +
+            " · gen: " +
+            loadGen +
+            " · want: " +
+            (hovered ? "final" : "original");
+        }
+
+        function log(msg, cls) {
+          var line = document.createElement("div");
+          if (cls) line.className = cls;
+          line.textContent = msg;
+          logEl.appendChild(line);
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function morph(wantHover) {
+          hovered = wantHover;
+          var gen = ++loadGen;
+          var label = wantHover ? "enter→final" : "leave→original";
+          pending += 1;
+          paintStatus();
+          log(
+            "#" +
+              gen +
+              " " +
+              label +
+              " started (delay " +
+              delayMs() +
+              "ms)",
+          );
+
+          var t = setTimeout(function () {
+            pending -= 1;
+            var useGuard = guardEl.checked;
+            if (useGuard) {
+              if (gen !== loadGen) {
+                log("#" + gen + " stale gen — ignored", "stale");
+                paintStatus();
+                return;
+              }
+              if (hovered !== wantHover) {
+                log("#" + gen + " desire flipped — ignored", "stale");
+                paintStatus();
+                return;
+              }
+            }
+            var next = wantHover ? "final" : "original";
+            setShape(next);
+            log(
+              "#" +
+                gen +
+                " applied " +
+                next +
+                (useGuard ? "" : " (unguarded)"),
+              useGuard ? "ok" : "stale",
+            );
+            paintStatus();
+          }, delayMs());
+          timers.push(t);
+        }
+
+        document.getElementById("btn-enter").addEventListener("click", function () {
+          morph(true);
+        });
+        document.getElementById("btn-leave").addEventListener("click", function () {
+          morph(false);
+        });
+        document.getElementById("btn-reset").addEventListener("click", function () {
+          timers.forEach(clearTimeout);
+          timers = [];
+          loadGen = 0;
+          hovered = false;
+          pending = 0;
+          logEl.textContent = "";
+          setShape("original");
+          log("reset");
+        });
+        delayEl.addEventListener("input", function () {
+          delayLabel.textContent = delayMs() + "ms";
+        });
+
+        paintStatus();
+      })();
+    </script>
+  </body>
+</html>

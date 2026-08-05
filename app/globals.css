@@ -49,8 +49,8 @@
   --text-portofolio-title-badge--line-height: 15px;
   --text-portofolio-title-badge--font-weight: 700;
 
-  --text-portofolio-body: 13px;
-  --text-portofolio-body--line-height: 16px;
+  --text-portofolio-body: 11px;
+  --text-portofolio-body--line-height: 14px;
 
   --line-height-loose: 1.44;
 
@@ -61,6 +61,19 @@
   /* Z-Index Scale */
   --zphoto: 20;
   --znavbar: 50;
+
+  /* About flower pulse (GPU-friendly wrapper animation) */
+  --animate-flower-scale: flower-scale 600ms ease-in-out infinite;
+}
+
+@keyframes flower-scale {
+  0%,
+  100% {
+    transform: scale(1) rotate(-21deg);
+  }
+  50% {
+    transform: scale(0.8386, 0.8063);
+  }
 }
 
 @media (min-width: 600px) {

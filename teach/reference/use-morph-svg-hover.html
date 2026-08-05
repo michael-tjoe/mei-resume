@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference — useMorphSvgHover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <style>
+      table.ref {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--sans);
+        font-size: 0.88rem;
+        margin: 1rem 0 1.5rem;
+      }
+      table.ref th,
+      table.ref td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.55rem 0.45rem;
+        border-bottom: 1px solid var(--line);
+      }
+      table.ref th {
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      table.ref code {
+        font-size: 0.82em;
+      }
+      .flow {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        line-height: 1.55;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 1rem;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      @media print {
+        body {
+          background: white;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Reference · Chalks</p>
+        <h1>useMorphSvgHover</h1>
+        <p class="lede">
+          Compressed map of the shared MorphSVG hover hook. Print-friendly.
+        </p>
+      </header>
+
+      <h2>Job</h2>
+      <p>
+        Wire chalk SVG icons so hover morphs to a final shape and leave morphs
+        back — without loading MorphSVG until needed, without stale async
+        races, and without reduced-motion users getting motion.
+      </p>
+      <p>
+        Call site (e.g.
+        <code>Game.tsx</code>): pass a path selector + two
+        <code>MorphAnimate</code> fns; spread
+        <code>onMouseEnter</code> / <code>onMouseLeave</code> and attach
+        <code>wrapperRef</code> / <code>svgRef</code>.
+      </p>
+
+      <h2>Return value</h2>
+      <table class="ref">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Attach to</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>wrapperRef</code></td>
+            <td>Hover target <code>div</code> (also path query root)</td>
+          </tr>
+          <tr>
+            <td><code>svgRef</code></td>
+            <td><code>&lt;svg&gt;</code> (viewBox tweens)</td>
+          </tr>
+          <tr>
+            <td><code>groupRef</code></td>
+            <td>Optional <code>&lt;g&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>onMouseEnter</code></td>
+            <td><code>morph(true)</code></td>
+          </tr>
+          <tr>
+            <td><code>onMouseLeave</code></td>
+            <td><code>morph(false)</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Refs (mutable state, no re-render)</h2>
+      <table class="ref">
+        <thead>
+          <tr>
+            <th>Ref</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>pathsRef</code></td>
+            <td>Cached <code>querySelectorAll</code> result; cleared if selector changes</td>
+          </tr>
+          <tr>
+            <td><code>tweensRef</code></td>
+            <td>Active morph tweens; killed before new morph / on unmount</td>
+          </tr>
+          <tr>
+            <td><code>hoveredRef</code></td>
+            <td>Desired hover state when async load resolves</td>
+          </tr>
+          <tr>
+            <td><code>loadGenRef</code></td>
+            <td>Monotonic generation; stale <code>then</code> callbacks bail</td>
+          </tr>
+          <tr>
+            <td><code>animateFinalRef</code> / <code>animateOriginalRef</code></td>
+            <td>Latest animate fns (synced in an effect)</td>
+          </tr>
+          <tr>
+            <td><code>pathSelectorRef</code></td>
+            <td>Latest CSS selector string</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Effects vs handlers</h2>
+      <table class="ref">
+        <thead>
+          <tr>
+            <th>Where</th>
+            <th>What runs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Effect</td>
+            <td>Sync animate fn refs; reset path cache on selector change; kill tweens on unmount</td>
+          </tr>
+          <tr>
+            <td>Handler (<code>morph</code>)</td>
+            <td>Reduced-motion guard → bump gen → lazy-load → validate → kill → animate</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><code>morph(wantHover)</code> flow</h2>
+      <div class="flow">if prefersReducedMotion() → return
+hoveredRef = wantHover
+gen = ++loadGenRef
+
+loadMorphGsap().then(gsap => {
+  if gen !== loadGenRef          → return  // newer call won
+  if hoveredRef !== wantHover    → return  // desire flipped
+  if !wrapperRef                 → return  // unmounted
+  killTweens()
+  tweens = wantHover
+    ? animateFinalRef(gsap, ctx)
+    : animateOriginalRef(gsap, ctx)
+})</div>
+
+      <h2>Related</h2>
+      <ul class="links">
+        <li>
+          <a href="../lessons/0003-stale-async-hover-race.html"
+            >Lesson 03 — Stale async hover race</a
+          >
+        </li>
+        <li>
+          <a href="../../app/containers/ResumeCover/components/ResumePhoto/components/Chalks/useMorphSvgHover.ts"
+            ><code>useMorphSvgHover.ts</code></a
+          >
+        </li>
+        <li>
+          <a href="../../app/containers/ResumeCover/components/ResumePhoto/components/Chalks/loadMorphGsap.ts"
+            ><code>loadMorphGsap.ts</code></a
+          >
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>

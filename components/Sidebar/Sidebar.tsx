@@ -1,9 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import gsap from 'gsap';
+import BrandLogo from '@/components/BrandLogo/BrandLogo';
+import { prefersReducedMotion } from '@/helpers/prefersReducedMotion';
+import { loadGsap } from '@/hooks/loadGsap';
+import gloves from './assets/gloves.png';
 import icClose from './assets/ic-close.svg';
 
 interface SidebarProps {
@@ -17,57 +20,128 @@ const navItems = [
   { label: 'contact', href: '#contact' },
 ] as const;
 
+const ANIM_DURATION = 0.2;
+
+/** Hoisted static JSX (rendering-hoist-jsx). */
+const closeImage = (
+  <Image src={icClose} alt="" width={52} height={52} unoptimized className="size-full" />
+);
+
+const brandLogo = <BrandLogo text="stefanny’s" rotate={-7.03} left={51} />;
+
+const glovesImage = (
+  <Image src={gloves} alt="" width={198} height={180} className="size-full" aria-hidden />
+);
+
 function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [shouldRender, setShouldRender] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<{ kill: () => void } | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      setShouldRender(true);
-    } else if (shouldRender) {
-      const tl = gsap.timeline({
-        onComplete: () => setShouldRender(false),
-      });
+  // Mount on open during render — avoids cascading setState-in-effect (rerender-derived-state-no-effect).
+  if (isOpen && !shouldRender) {
+    setShouldRender(true);
+  }
 
-      tl.to(panelRef.current, {
-        xPercent: -100,
-        duration: 0.2,
-        ease: 'none',
-      }).to(
-        overlayRef.current,
-        {
-          opacity: 0,
-          duration: 0.2,
-          ease: 'none',
-        },
-        0,
-      );
+  const killTimeline = () => {
+    timelineRef.current?.kill();
+    timelineRef.current = null;
+  };
+
+  const animateIn = useEffectEvent(async () => {
+    const panel = panelRef.current;
+    const overlay = overlayRef.current;
+    if (!panel || !overlay) return;
+
+    if (prefersReducedMotion()) {
+      panel.style.transform = 'none';
+      overlay.style.opacity = '0.5';
+      return;
     }
-  }, [isOpen, shouldRender]);
 
-  useEffect(() => {
-    if (shouldRender && isOpen && overlayRef.current && panelRef.current) {
-      gsap.set(panelRef.current, { xPercent: -100 });
-      gsap.set(overlayRef.current, { opacity: 0 });
+    const gsap = await loadGsap();
+    if (!panelRef.current || !overlayRef.current) return;
 
-      const tl = gsap.timeline();
-
-      tl.to(panelRef.current, {
+    killTimeline();
+    gsap.set(panel, { xPercent: -100 });
+    gsap.set(overlay, { opacity: 0 });
+    timelineRef.current = gsap
+      .timeline()
+      .to(panel, {
         xPercent: 0,
-        duration: 0.2,
+        duration: ANIM_DURATION,
         ease: 'none',
-      }).to(
-        overlayRef.current,
+      })
+      .to(
+        overlay,
         {
           opacity: 0.5,
-          duration: 0.2,
+          duration: ANIM_DURATION,
           ease: 'none',
         },
         0,
       );
+  });
+
+  const animateOut = useEffectEvent(async () => {
+    const panel = panelRef.current;
+    const overlay = overlayRef.current;
+
+    if (!panel || !overlay || prefersReducedMotion()) {
+      setShouldRender(false);
+      return;
     }
+
+    const gsap = await loadGsap();
+    if (!panelRef.current || !overlayRef.current) {
+      setShouldRender(false);
+      return;
+    }
+
+    killTimeline();
+    timelineRef.current = gsap
+      .timeline({
+        onComplete: () => setShouldRender(false),
+      })
+      .to(panel, {
+        xPercent: -100,
+        duration: ANIM_DURATION,
+        ease: 'none',
+      })
+      .to(
+        overlay,
+        {
+          opacity: 0,
+          duration: ANIM_DURATION,
+          ease: 'none',
+        },
+        0,
+      );
+  });
+
+  // Animate in after portal nodes mount (bundle-conditional GSAP via loadGsap).
+  useEffect(() => {
+    if (!shouldRender || !isOpen) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      await animateIn();
+      if (cancelled) killTimeline();
+    })();
+
+    return () => {
+      cancelled = true;
+      killTimeline();
+    };
   }, [shouldRender, isOpen]);
+
+  // Animate out on close; unmount only after the timeline completes.
+  useEffect(() => {
+    if (isOpen || !shouldRender) return;
+    void animateOut();
+  }, [isOpen, shouldRender]);
 
   if (!shouldRender) return null;
 
@@ -81,10 +155,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
       />
 
       {/* Width includes close-tab overhang (499 + 71). */}
-      <div
-        ref={panelRef}
-        className="fixed top-0 left-0 z-(--znavbar) h-full w-142.5 max-w-[90vw]"
-      >
+      <div ref={panelRef} className="fixed top-0 left-0 z-(--znavbar) h-full w-142.5 max-w-[90vw]">
         <div className="relative h-full w-124.75 max-w-full bg-brand-tan">
           <div className="absolute top-0 left-110.5 flex h-34.75 w-32 items-center justify-center rounded-r-[50px] bg-brand-tan">
             <button
@@ -93,19 +164,14 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
               className="relative size-13 rotate-45 cursor-pointer transition-opacity hover:opacity-80"
               aria-label="Close menu"
             >
-              <Image
-                src={icClose}
-                alt=""
-                width={52}
-                height={52}
-                unoptimized
-                className="size-full"
-              />
+              {closeImage}
             </button>
           </div>
 
+          <div className="pt-12 pl-16">{brandLogo}</div>
+
           <nav
-            className="flex flex-col gap-[calc(8.33vh-4px)] pt-[calc(16.67%+11px)] pl-15.25"
+            className="mt-[calc(100vh*64/1080)] flex flex-col gap-[calc(100vh*36/1080)] pl-16"
             aria-label="Sidebar"
           >
             {navItems.map((item) => (
@@ -119,6 +185,13 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
               </a>
             ))}
           </nav>
+
+          <div
+            className="pointer-events-none absolute bottom-12 right-14 h-45 w-[198.5px]"
+            aria-hidden
+          >
+            {glovesImage}
+          </div>
         </div>
       </div>
     </>,
