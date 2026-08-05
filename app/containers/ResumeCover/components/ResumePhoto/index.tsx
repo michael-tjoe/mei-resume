@@ -5,7 +5,7 @@ import { MobileOnly } from '@/components/MobileOnly';
 import bgResume from './assets/bg-resume.jpg';
 import DesktopTitleBadge from '../DesktopTitleBadge';
 import DesktopTopCoverSection from '../DesktopTopCoverSection';
-import MobilePhotoBackground from '../MobilePhotoBackground';
+import MobileBackgroundLayer from '@/components/MobileBackgroundLayer';
 import MobileTitleBadge from '../MobileTitleBadge';
 import MobileDecorations from './MobileDecorations';
 import ResumeHeroImages from './ResumeHeroImages';
@@ -46,7 +46,7 @@ function ResumePhoto({ greeting = "hi, i'm", firstName, lastName }: ResumePhotoP
       </div>
 
       <MobileOnly>
-        <MobilePhotoBackground />
+        <MobileBackgroundLayer />
       </MobileOnly>
 
       <DesktopOnly>
