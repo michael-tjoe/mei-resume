@@ -1,6 +1,8 @@
 import type { StaticImageData } from 'next/image';
 
-import gebrakMockup from '../assets/gebrak/phone-mockup.webp';
+import gebrakMockup from '../assets/gebrak/phone-mockup.png';
+import masindoMockup from '../assets/masindo/phone-mockup.png';
+import { DESKTOP_GEBRAK_FEEDS, DESKTOP_MASINDO_FEEDS } from './desktopSlider';
 import { GEBRAK_FEEDS, KUISKABAR_FEEDS, MASINDO_FEEDS } from './slider';
 
 export type CompanyBlock = {
@@ -8,11 +10,25 @@ export type CompanyBlock = {
   subtitle: string;
   href: string;
   feeds: StaticImageData[];
-  gebrakPhoneMockup?: StaticImageData;
 };
 
-export type FeaturedCompanyBlock = CompanyBlock & {
-  gebrakPhoneMockup: StaticImageData;
+export type FeaturedCompanyBlock = {
+  name: string;
+  subtitle: string;
+  href: string;
+  mobileFeeds: StaticImageData[];
+  desktopFeeds: StaticImageData[];
+  phoneMockup: StaticImageData;
+};
+
+/** @masindo.id two-column showcase (Figma Frame 5). */
+export const MASINDO_PORTOFOLIO: FeaturedCompanyBlock = {
+  name: '@masindo.id',
+  subtitle: 'social media design',
+  href: 'https://www.instagram.com/masindo.id/',
+  mobileFeeds: MASINDO_FEEDS,
+  desktopFeeds: DESKTOP_MASINDO_FEEDS,
+  phoneMockup: masindoMockup,
 };
 
 /** @gerakanbebastar two-column showcase (Figma Frame 5). */
@@ -20,8 +36,9 @@ export const GEBRAK_PORTOFOLIO: FeaturedCompanyBlock = {
   name: '@gerakanbebastar',
   subtitle: 'social media design',
   href: 'https://www.instagram.com/gerakanbebastar/',
-  feeds: GEBRAK_FEEDS,
-  gebrakPhoneMockup: gebrakMockup,
+  mobileFeeds: GEBRAK_FEEDS,
+  desktopFeeds: DESKTOP_GEBRAK_FEEDS,
+  phoneMockup: gebrakMockup,
 };
 
 export const COMPANIES: CompanyBlock[] = [
@@ -29,7 +46,7 @@ export const COMPANIES: CompanyBlock[] = [
     name: '@masindo.id',
     subtitle: 'social media design',
     href: 'https://www.instagram.com/masindo.id/',
-    feeds: MASINDO_FEEDS,
+    feeds: MASINDO_PORTOFOLIO.mobileFeeds,
   },
   {
     name: '@koalisibebas_tar',
@@ -37,5 +54,10 @@ export const COMPANIES: CompanyBlock[] = [
     href: 'https://www.instagram.com/masindo.id/',
     feeds: KUISKABAR_FEEDS,
   },
-  GEBRAK_PORTOFOLIO,
+  {
+    name: '@gerakanbebastar',
+    subtitle: 'social media design',
+    href: 'https://www.instagram.com/gerakanbebastar/',
+    feeds: GEBRAK_PORTOFOLIO.mobileFeeds,
+  },
 ];

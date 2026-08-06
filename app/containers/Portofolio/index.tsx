@@ -7,7 +7,7 @@ import Slider from '@/components/Slider';
 
 import CompanyName from './components/CompanyName';
 import WithPhonePortofolioLayout from './components/WithPhonePortofolioLayout';
-import { COMPANIES, GEBRAK_PORTOFOLIO } from './constants/companies';
+import { COMPANIES, GEBRAK_PORTOFOLIO, MASINDO_PORTOFOLIO } from './constants/companies';
 import DesktopNavbar from '@/components/PortofolioNavigation/DesktopNavbar';
 import { PORTOFOLIO_NAV_RAIL_ID } from '@/providers/NavigationProvider';
 
@@ -40,8 +40,12 @@ export default function Portofolio() {
         <div id={PORTOFOLIO_NAV_RAIL_ID} className="absolute inset-y-0 left-0 z-(--znavbar) w-18">
           <DesktopNavbar sticky invert text="portofolio" />
         </div>
-        <div className="flex h-full shrink-0 grow flex-col pl-35.5">
-          <WithPhonePortofolioLayout {...GEBRAK_PORTOFOLIO} />
+
+        <div className="flex h-full shrink-0 grow-0 flex-col items-start pl-35.5">
+          <div className="flex h-full pl-18">
+            <WithPhonePortofolioLayout {...MASINDO_PORTOFOLIO} />
+            <WithPhonePortofolioLayout {...GEBRAK_PORTOFOLIO} />
+          </div>
         </div>
       </DesktopOnly>
 

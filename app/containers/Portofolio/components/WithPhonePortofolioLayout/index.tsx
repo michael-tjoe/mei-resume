@@ -9,8 +9,8 @@ type WithPhonePortofolioLayoutProps = {
   name: string;
   subtitle: string;
   href: string;
-  feeds: StaticImageData[];
-  gebrakPhoneMockup: StaticImageData;
+  desktopFeeds: StaticImageData[];
+  phoneMockup: StaticImageData;
   className?: string;
 };
 
@@ -42,18 +42,21 @@ function WithPhonePortofolioLayout({
   name,
   subtitle,
   href,
-  feeds,
-  gebrakPhoneMockup,
+  desktopFeeds,
+  phoneMockup,
   className,
 }: WithPhonePortofolioLayoutProps) {
   return (
     <div
-      className={cn('flex size-full shrink-0 flex-col justify-center px-18 pt-10 pb-8', className)}
+      className={cn(
+        'flex aspect-1518/1080 h-full max-w-full shrink-0 flex-col justify-center pt-10 pb-8',
+        className,
+      )}
     >
       <SectionDivider className="shrink-0 grow-0" />
 
-      <div className="mt-8 flex min-h-0 shrink grow items-stretch gap-6 overflow-hidden pb-6">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="mt-8 flex shrink grow overflow-hidden pb-5">
+        <div className="relative flex aspect-830/754 max-h-full max-w-full shrink-0 grow-0 flex-col">
           <div className="flex shrink-0 items-center gap-3">
             <div className="flex flex-col text-brand-dark">
               <p className="text-2xl/normal font-bold">{name}</p>
@@ -70,29 +73,24 @@ function WithPhonePortofolioLayout({
             </a>
           </div>
 
-          <div className="mt-5 grid min-h-0 flex-1 grid-cols-[repeat(3,calc((100%-2*24px)/3))] grid-rows-[repeat(3,calc((100%-2*20px)/3))] gap-x-6 gap-y-5">
-            {feeds.map((src, index) => (
-              <div key={index} className="relative size-full overflow-hidden">
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="(min-width: 840px) 15vw"
-                  className="object-cover"
-                />
+          <div className="mt-5 grid size-full  grid-cols-4 grid-rows-3 gap-x-6 gap-y-3 overflow-hidden">
+            {desktopFeeds.map((src, index) => (
+              <div key={index} className="relative aspect-193/241 h-full overflow-hidden">
+                <Image src={src} alt="" fill className="object-cover" unoptimized />
               </div>
             ))}
           </div>
         </div>
 
-        <div className="relative h-full shrink-0">
+        <div className="relative aspect-552/1275 h-full max-w-full shrink-0 grow">
           <Image
-            src={gebrakPhoneMockup}
+            src={phoneMockup}
             alt={`${name} Instagram feed mockup`}
             width={1104}
-            height={2192}
-            className="h-full w-auto max-w-none"
+            height={2160}
+            className="size-full object-contain"
             priority
+            unoptimized
           />
         </div>
       </div>
