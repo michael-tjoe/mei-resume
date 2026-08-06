@@ -12,6 +12,18 @@ import gebrakDesktop9 from '../assets/gebrak/desktop/gebrak_desktop_feed-9.png';
 import gebrakDesktop10 from '../assets/gebrak/desktop/gebrak_desktop_feed-10.png';
 import gebrakDesktop11 from '../assets/gebrak/desktop/gebrak_desktop_feed-11.png';
 import gebrakDesktop12 from '../assets/gebrak/desktop/gebrak_desktop_feed-12.png';
+import kuiskabarDesktop1 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-1.png';
+import kuiskabarDesktop2 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-2.png';
+import kuiskabarDesktop3 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-3.png';
+import kuiskabarDesktop4 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-4.png';
+import kuiskabarDesktop5 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-5.png';
+import kuiskabarDesktop6 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-6.png';
+import kuiskabarDesktop7 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-7.png';
+import kuiskabarDesktop8 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-8.png';
+import kuiskabarDesktop9 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-9.png';
+import kuiskabarDesktop10 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-10.png';
+import kuiskabarDesktop11 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-11.png';
+import kuiskabarDesktop12 from '../assets/kuiskabar/desktop/kuiskabar_desktop_feed-12.png';
 import masindoDesktop1 from '../assets/masindo/desktop/masindo_desktop_feed-1.png';
 import masindoDesktop2 from '../assets/masindo/desktop/masindo_desktop_feed-2.png';
 import masindoDesktop3 from '../assets/masindo/desktop/masindo_desktop_feed-3.png';
@@ -39,6 +51,22 @@ export const DESKTOP_GEBRAK_FEEDS: StaticImageData[] = [
   gebrakDesktop10,
   gebrakDesktop11,
   gebrakDesktop12,
+];
+
+/** Hoisted static gallery (rendering-hoist-jsx / server-hoist-static-io). */
+export const DESKTOP_KUISKABAR_FEEDS: StaticImageData[] = [
+  kuiskabarDesktop1,
+  kuiskabarDesktop2,
+  kuiskabarDesktop3,
+  kuiskabarDesktop4,
+  kuiskabarDesktop5,
+  kuiskabarDesktop6,
+  kuiskabarDesktop7,
+  kuiskabarDesktop8,
+  kuiskabarDesktop9,
+  kuiskabarDesktop10,
+  kuiskabarDesktop11,
+  kuiskabarDesktop12,
 ];
 
 /** Hoisted static gallery (rendering-hoist-jsx / server-hoist-static-io). */

@@ -1,16 +1,14 @@
 import type { StaticImageData } from 'next/image';
 
 import gebrakMockup from '../assets/gebrak/phone-mockup.png';
+import kuiskabarMockup from '../assets/kuiskabar/phone-mockup.png';
 import masindoMockup from '../assets/masindo/phone-mockup.png';
-import { DESKTOP_GEBRAK_FEEDS, DESKTOP_MASINDO_FEEDS } from './desktopSlider';
+import {
+  DESKTOP_GEBRAK_FEEDS,
+  DESKTOP_KUISKABAR_FEEDS,
+  DESKTOP_MASINDO_FEEDS,
+} from './desktopSlider';
 import { GEBRAK_FEEDS, KUISKABAR_FEEDS, MASINDO_FEEDS } from './slider';
-
-export type CompanyBlock = {
-  name: string;
-  subtitle: string;
-  href: string;
-  feeds: StaticImageData[];
-};
 
 export type FeaturedCompanyBlock = {
   name: string;
@@ -21,7 +19,6 @@ export type FeaturedCompanyBlock = {
   phoneMockup: StaticImageData;
 };
 
-/** @masindo.id two-column showcase (Figma Frame 5). */
 export const MASINDO_PORTOFOLIO: FeaturedCompanyBlock = {
   name: '@masindo.id',
   subtitle: 'social media design',
@@ -31,7 +28,15 @@ export const MASINDO_PORTOFOLIO: FeaturedCompanyBlock = {
   phoneMockup: masindoMockup,
 };
 
-/** @gerakanbebastar two-column showcase (Figma Frame 5). */
+export const KUISKABAR_PORTOFOLIO: FeaturedCompanyBlock = {
+  name: '@koalisibebas_tar',
+  subtitle: 'social media design',
+  href: 'https://www.instagram.com/koalisibebas_tar/',
+  mobileFeeds: KUISKABAR_FEEDS,
+  desktopFeeds: DESKTOP_KUISKABAR_FEEDS,
+  phoneMockup: kuiskabarMockup,
+};
+
 export const GEBRAK_PORTOFOLIO: FeaturedCompanyBlock = {
   name: '@gerakanbebastar',
   subtitle: 'social media design',
@@ -41,23 +46,8 @@ export const GEBRAK_PORTOFOLIO: FeaturedCompanyBlock = {
   phoneMockup: gebrakMockup,
 };
 
-export const COMPANIES: CompanyBlock[] = [
-  {
-    name: '@masindo.id',
-    subtitle: 'social media design',
-    href: 'https://www.instagram.com/masindo.id/',
-    feeds: MASINDO_PORTOFOLIO.mobileFeeds,
-  },
-  {
-    name: '@koalisibebas_tar',
-    subtitle: 'social media design',
-    href: 'https://www.instagram.com/masindo.id/',
-    feeds: KUISKABAR_FEEDS,
-  },
-  {
-    name: '@gerakanbebastar',
-    subtitle: 'social media design',
-    href: 'https://www.instagram.com/gerakanbebastar/',
-    feeds: GEBRAK_PORTOFOLIO.mobileFeeds,
-  },
+export const SOCIAL_MEDIA_DESIGNS_PORTOFOLIO: FeaturedCompanyBlock[] = [
+  MASINDO_PORTOFOLIO,
+  KUISKABAR_PORTOFOLIO,
+  GEBRAK_PORTOFOLIO,
 ];

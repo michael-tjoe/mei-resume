@@ -2,14 +2,15 @@ import Image, { type StaticImageData } from 'next/image';
 
 import { DesktopOnly } from '@/components/DesktopOnly';
 import { MobileOnly } from '@/components/MobileOnly';
+import DesktopNavbar from '@/components/PortofolioNavigation/DesktopNavbar';
 import SectionTitle from '@/components/SectionTitle';
 import Slider from '@/components/Slider';
+import { cn } from '@/lib/cn';
+import { PORTOFOLIO_NAV_RAIL_ID } from '@/providers/NavigationProvider';
 
 import CompanyName from './components/CompanyName';
 import WithPhonePortofolioLayout from './components/WithPhonePortofolioLayout';
-import { COMPANIES, GEBRAK_PORTOFOLIO, MASINDO_PORTOFOLIO } from './constants/companies';
-import DesktopNavbar from '@/components/PortofolioNavigation/DesktopNavbar';
-import { PORTOFOLIO_NAV_RAIL_ID } from '@/providers/NavigationProvider';
+import { SOCIAL_MEDIA_DESIGNS_PORTOFOLIO } from './constants/socialMediaDesigns';
 
 const CARD_CLASS = 'relative aspect-[206/258] overflow-hidden';
 const IMAGE_CLASS = 'object-cover';
@@ -43,8 +44,13 @@ export default function Portofolio() {
 
         <div className="flex h-full shrink-0 grow-0 flex-col items-start pl-35.5">
           <div className="flex h-full pl-18">
-            <WithPhonePortofolioLayout {...MASINDO_PORTOFOLIO} />
-            <WithPhonePortofolioLayout {...GEBRAK_PORTOFOLIO} />
+            {SOCIAL_MEDIA_DESIGNS_PORTOFOLIO.map((portfolio, index) => (
+              <WithPhonePortofolioLayout
+                key={portfolio.name}
+                {...portfolio}
+                className={cn(index % 2 === 1 && 'bg-white', index > 0 && 'pl-18')}
+              />
+            ))}
           </div>
         </div>
       </DesktopOnly>
@@ -57,15 +63,15 @@ export default function Portofolio() {
           className="scroll-mt-[calc(var(--spacing)*12.25-20px)] px-side pt-10 pb-5"
         />
         <div className="pt-3 [&>div:not(:last-child)]:mb-7">
-          {COMPANIES.map((company, index) => (
-            <div key={index}>
+          {SOCIAL_MEDIA_DESIGNS_PORTOFOLIO.map((portfolio) => (
+            <div key={portfolio.name}>
               <CompanyName
-                name={company.name}
-                subtitle={company.subtitle}
-                href={company.href}
+                name={portfolio.name}
+                subtitle={portfolio.subtitle}
+                href={portfolio.href}
                 className="px-side"
               />
-              <FeedSlider feeds={company.feeds} />
+              <FeedSlider feeds={portfolio.mobileFeeds} />
             </div>
           ))}
         </div>
