@@ -23,14 +23,17 @@ interface DesktopNavbarProps {
   className?: string;
   /** Stick within the parent section instead of fixed + body portal. */
   sticky?: boolean;
-  /** Dark-brown chrome (for dark portfolio surfaces). */
+  /** Dark-brown chrome (for dark portfolio surfaces / rail overlap). */
   invert?: boolean;
+  /** Sidebar TypographyArt title (defaults inside Sidebar). */
+  text?: string;
 }
 
 export default function DesktopNavbar({
   className,
   sticky = false,
   invert = false,
+  text,
 }: DesktopNavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
@@ -40,7 +43,7 @@ export default function DesktopNavbar({
   const navbarContent = (
     <nav
       className={cn(
-        'z-(--znavbar) flex items-start justify-center',
+        'z-(--znavbar) flex items-start justify-center transition-colors duration-300',
         surfaceClass,
         sticky ? 'sticky top-0 h-dvh w-full' : 'fixed top-0 left-0 h-full w-18',
         className,
@@ -50,7 +53,7 @@ export default function DesktopNavbar({
       <button
         type="button"
         className={cn(
-          'absolute top-0 left-0 z-(--znavbar) flex h-34.75 cursor-pointer flex-col items-center justify-center rounded-r-[50px] pr-11.5 pl-7.5 text-white transition-opacity desktop:translate-x-3.5',
+          'absolute top-0 left-0 z-(--znavbar) flex h-34.75 cursor-pointer flex-col items-center justify-center rounded-r-[50px] pr-11.5 pl-7.5 text-white transition-colors duration-300 desktop:translate-x-3.5',
           surfaceClass,
         )}
         aria-label="Open menu"
@@ -60,7 +63,12 @@ export default function DesktopNavbar({
         <HamburgerIcon className="ml-11 desktop:ml-0" />
       </button>
 
-      <Sidebar isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      <Sidebar
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        invert={invert}
+        text={text}
+      />
     </nav>
   );
 

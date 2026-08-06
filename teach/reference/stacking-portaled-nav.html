@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference — Stacking vs portaled nav</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Reference</p>
+        <h1>Stacking vs portaled nav</h1>
+        <p class="lede">
+          Cheat sheet for why HorizontalScroll’s panel <code>x</code> defeats
+          in-panel <code>z-index</code>, and how DesktopNavbar morphs on perfect
+          rail overlap.
+        </p>
+      </header>
+
+      <h2>Actors</h2>
+      <pre>document.body
+  └─ DesktopNavbar (portal)     fixed + z(--znavbar)     ← always viewport-left
+
+main[containerRef]  pin
+  div[panelsRef]    transform: translateX(...)          ← stacking context
+    …panels…
+    Portofolio
+      #portofolio-nav-rail       absolute left rail
+        DesktopNavbar sticky invert</pre>
+
+      <h2>Why raising z-index failed</h2>
+      <ul>
+        <li>
+          Non-<code>none</code> <code>transform</code> → new
+          <strong>stacking context</strong> (atomic unit in parent).
+        </li>
+        <li>
+          Child <code>z-index</code> only compares
+          <em>inside</em> that context.
+        </li>
+        <li>
+          Body portal is a sibling of the transformed tree → paints above it
+          regardless of portfolio <code>z-index: 60</code>.
+        </li>
+      </ul>
+
+      <h2>Shipped rule</h2>
+      <pre>rail.left &lt;= 1px  →  fixed nav bg-brand-dark (+ 300ms transition)
+rail.left &gt; 1px   →  fixed nav bg-brand-tan
+
+Measure: #portofolio-nav-rail (not the whole section)
+Keep sticky invert mounted (double-paint OK when aligned)</pre>
+
+      <h2>Not this</h2>
+      <ul>
+        <li>Early invert at <code>left ≤ 72</code> (column touch)</li>
+        <li>Hide/show the portal to “win” stacking</li>
+        <li>Reparent / <code>position: static</code> into the rail</li>
+      </ul>
+
+      <h2>Code map</h2>
+      <ul>
+        <li>
+          <code>PORTOFOLIO_NAV_RAIL_ID</code> /
+          <code>isRailPerfectlyOverlapped</code> →
+          <code>components/PortofolioNavigation/DesktopNavbar.tsx</code>
+        </li>
+        <li>
+          Rail markup →
+          <code>app/containers/Portofolio/index.tsx</code>
+        </li>
+        <li>
+          Panel <code>x</code> →
+          <code>hooks/useHorizontalScroll.ts</code> (<code>gsap.to(panelsEl, { x })</code>)
+        </li>
+      </ul>
+
+      <h2>Citations</h2>
+      <ul>
+        <li>
+          <a
+            href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context"
+            >MDN: Stacking context</a
+          >
+        </li>
+        <li>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform"
+            >MDN: transform</a
+          >
+        </li>
+        <li>
+          <a href="https://www.w3.org/TR/css-transforms/#transform-rendering"
+            >CSS Transforms — transform rendering</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect"
+            >MDN: getBoundingClientRect</a
+          >
+        </li>
+      </ul>
+
+      <footer class="lesson-footer">
+        <ul class="links">
+          <li>
+            <a href="../lessons/0005-stacking-vs-portaled-nav.html"
+              >Lesson 05</a
+            >
+          </li>
+          <li>
+            <a href="./fake-horizontal-scroll.html"
+              >Fake horizontal scroll</a
+            >
+          </li>
+          <li><a href="../MISSION.md">Mission</a></li>
+        </ul>
+      </footer>
+    </div>
+  </body>
+</html>

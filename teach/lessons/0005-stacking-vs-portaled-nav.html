@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 05 — Stacking vs portaled nav</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Lesson 05 · HorizontalScroll + DesktopNavbar</p>
+        <h1>Why z-index lost — morph on perfect overlap</h1>
+        <p class="lede">
+          One idea: a <code>transform</code> on the panels track traps in-panel
+          <code>z-index</code>. A body-portaled fixed nav wins the paint war —
+          so we morph its color when the sticky rail perfectly overlaps it.
+        </p>
+        <p class="meta">
+          ~7 minutes · tied to <code>DesktopNavbar</code> +
+          <code>panelsRef</code> <code>x</code> translate
+        </p>
+      </header>
+
+      <h2>The failure mode you hit</h2>
+      <p>
+        Portfolio mounts a sticky invert rail
+        (<code>#portofolio-nav-rail</code>). The global nav is
+        <code>createPortal(..., document.body)</code> +
+        <code>position: fixed</code>. Raising the portfolio section’s
+        <code>z-index</code> did nothing useful: the panels row already has a
+        GSAP <code>transform: translateX(...)</code>.
+      </p>
+      <div class="note">
+        Per
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform"
+          >MDN <code>transform</code></a
+        >
+        and the
+        <a href="https://www.w3.org/TR/css-transforms/#transform-rendering"
+          >CSS Transforms spec</a
+        >: any non-<code>none</code> transform creates a
+        <strong>stacking context</strong> and a containing block for
+        descendants. Nested <code>z-index</code> only sorts
+        <em>inside</em> that context; the whole transformed subtree paints as
+        one unit against siblings / the root.
+        (<a
+          href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context"
+          >MDN: stacking context</a
+        >.
+      </div>
+      <p>
+        Body-portaled fixed chrome lives
+        <em>outside</em> that transformed unit, so it stays on top of every
+        panel — including a “higher” portfolio <code>z-index</code>.
+      </p>
+
+      <h2>The pattern that shipped</h2>
+      <p>Don’t fight paint order. Change the fixed nav’s surface when geometry says the dark rail has docked:</p>
+      <pre>// rail = #portofolio-nav-rail
+rail.getBoundingClientRect().left &lt;= 1  →  bg-brand-dark
+rail.getBoundingClientRect().left &gt; 1   →  bg-brand-tan</pre>
+      <ul>
+        <li>
+          <strong>Perfect overlap</strong> = rail flush with viewport left
+          (<code>left ≈ 0</code>), not early intersect (<code>left ≤ 72</code>).
+        </li>
+        <li>
+          Keep the sticky invert copy mounted (double-paint when aligned is OK).
+        </li>
+        <li>
+          Sync with <code>IntersectionObserver</code> + scroll/resize (GSAP scrub
+          moves the rail without always “feeling” like a discrete event).
+        </li>
+      </ul>
+
+      <h2>Feel it</h2>
+      <p>
+        Drag progress. Tan strip = body-portaled fixed nav (always on top). Dark
+        rail rides the transformed track. When <code>rail.left ≤ 1</code>, the
+        fixed strip morphs dark (~300ms).
+      </p>
+      <div class="overlap-sim" id="overlap">
+        <div class="overlap-sim-stage">
+          <div class="overlap-sim-track" id="overlap-track">
+            <div class="overlap-sim-panel early">Earlier panels…</div>
+            <div class="overlap-sim-panel portfolio">
+              <div class="overlap-sim-rail" id="rail">rail</div>
+              <div style="padding: 0.75rem; align-self: center">Portfolio</div>
+            </div>
+          </div>
+          <div class="overlap-sim-fixed" id="fixed-nav">fixed</div>
+        </div>
+        <div class="sim-controls">
+          <label for="overlap-scroll">Horizontal progress (scrub)</label>
+          <input id="overlap-scroll" type="range" min="0" max="200" value="0" />
+          <div class="sim-readout">
+            <span>rail.left: <span id="rail-left">140</span>px</span>
+            <span id="overlap-state">separated → tan</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>Check yourself</h2>
+      <div class="card">
+        <p style="margin-top: 0">
+          In-panel sticky nav can’t beat a body-portaled fixed nav after GSAP
+          <code>x</code> on the track. What should you do instead?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="z-index inside the transform still loses to the portal."
+          >
+            Bump z-index on the in-panel sticky rail
+          </button>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Yes — morph the fixed surface when rail.left ≈ 0."
+          >
+            Morph fixed nav color on perfect overlap
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Sticky inside the track still sits under the portal."
+          >
+            Relocate fixed nav sticky into the track
+          </button>
+        </div>
+        <p class="feedback" data-feedback></p>
+      </div>
+
+      <h2>Primary source</h2>
+      <p>
+        Read
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context"
+          >MDN: Stacking context</a
+        >
+        (nested contexts are atomic) and skim
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform"
+          >MDN: <code>transform</code></a
+        >
+        (creates stacking context + containing block). Then glance at
+        <code>isRailPerfectlyOverlapped</code> in
+        <code>components/PortofolioNavigation/DesktopNavbar.tsx</code>.
+      </p>
+
+      <footer class="lesson-footer">
+        <p>
+          Ask follow-ups anytime — I’m your teacher for this mission. Next we
+          can dig into why <code>createPortal</code> to <code>body</code> was
+          chosen for the early-section nav, or how dense IO thresholds pair with
+          scrub.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../reference/stacking-portaled-nav.html"
+              >Reference: stacking vs portaled nav</a
+            >
+          </li>
+          <li>
+            <a href="../reference/fake-horizontal-scroll.html"
+              >Reference: fake horizontal scroll</a
+            >
+          </li>
+          <li><a href="./0001-pin-scrub-translate.html">Lesson 01</a></li>
+          <li><a href="../MISSION.md">Mission</a></li>
+          <li><a href="../RESOURCES.md">Resources</a></li>
+        </ul>
+      </footer>
+    </div>
+
+    <script src="../assets/quiz.js"></script>
+    <script>
+      TeachQuiz.wireAllQuizzes();
+
+      var overlap = document.getElementById("overlap");
+      var input = document.getElementById("overlap-scroll");
+      var fixedNav = document.getElementById("fixed-nav");
+      var railLeftEl = document.getElementById("rail-left");
+      var stateEl = document.getElementById("overlap-state");
+      var stage = document.querySelector(".overlap-sim-stage");
+      var rail = document.getElementById("rail");
+
+      function earlyWidthPx() {
+        var raw = getComputedStyle(overlap).getPropertyValue("--early-w").trim();
+        var n = parseFloat(raw);
+        return Number.isFinite(n) ? n : 140;
+      }
+
+      function update() {
+        var t = Number(input.value) / 200;
+        var shiftMax = earlyWidthPx();
+        var shift = t * shiftMax;
+        overlap.style.setProperty("--rail-shift", shift + "px");
+
+        // Measure after layout: rail left relative to stage (simulates viewport).
+        var stageRect = stage.getBoundingClientRect();
+        var railRect = rail.getBoundingClientRect();
+        var left = Math.round(railRect.left - stageRect.left);
+        railLeftEl.textContent = String(left);
+
+        var overlapped = left <= 1;
+        fixedNav.classList.toggle("is-invert", overlapped);
+        stateEl.textContent = overlapped
+          ? "perfect overlap → invert"
+          : "separated → tan";
+      }
+
+      input.addEventListener("input", update);
+      window.addEventListener("resize", update);
+      update();
+    </script>
+  </body>
+</html>

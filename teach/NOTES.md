@@ -8,6 +8,7 @@
 - Hook-only vs DOM: remind that `enabled` / `target` are not `AddEventListenerOptions`.
 - Lesson 03 digression: user asked how `useMorphSvgHover` works (chalk MorphSVG hover). Mission still HorizontalScroll — treat as digression unless they confirm expanding to “own resume GSAP interactions.” Core lesson scoped to stale async enter/leave race (`loadGenRef` + `hoveredRef`); full hook map in `reference/use-morph-svg-hover.html`. Next possible beats: animate-fn refs pattern, path cache, or `loadMorphGsap` lazy import — only after they clear the race.
 - Lesson 04: user pointed at `loadMorphGsap.ts:13` (`??=`). Taught nullish-assign Promise cache; tie back to L03 (shared Promise ≠ no race).
+- Lesson 05 digression: DesktopNavbar invert on perfect rail overlap. Core insight: GSAP `x` on `panelsRef` creates a stacking context, so in-panel z-index cannot beat a body-portaled fixed nav — morph color when `#portofolio-nav-rail` `left ≈ 0` instead. Reference: `reference/stacking-portaled-nav.html`. LR-0001 records the corrected misconception.
 
 ## Hard constraint: lessons open via `file://`
 

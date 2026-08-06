@@ -10,6 +10,18 @@
 - [GSAP Scroll overview](https://gsap.com/scroll/)
   High-level pin + scrub demos. Use for: visual intuition before reading API details.
 
+### Stacking / portaled chrome (DesktopNavbar)
+- [MDN: Stacking context](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context)
+  Nested contexts are atomic; child `z-index` only sorts inside the parent context. Use for: why in-panel z cannot beat a body portal after panel `transform`.
+- [MDN: transform](https://developer.mozilla.org/en-US/docs/Web/CSS/transform)
+  Non-`none` transform creates a stacking context and a containing block for descendants. Use for: linking GSAP `x` on `panelsRef` to paint order bugs.
+- [CSS Transforms Module — transform rendering](https://www.w3.org/TR/css-transforms/#transform-rendering)
+  Spec text for stacking context + containing block from transforms. Use for: settling debates when MDN summaries feel thin.
+- [MDN: Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect)
+  Viewport-relative box after transforms. Use for: `isRailPerfectlyOverlapped` (`rail.left <= 1`).
+- [MDN: Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+  Async observation of visibility/intersection changes. Use for: syncing nav invert while GSAP scrub moves the rail.
+
 ### MorphSVG / chalk hover hook
 - [Docs: MorphSVGPlugin](https://gsap.com/docs/v3/Plugins/MorphSVGPlugin/)
   Path morph API (`morphSVG` shape, viewBox companions). Use for: what `animateFinal` / `animateOriginal` tween in Game/Mic/Paint.

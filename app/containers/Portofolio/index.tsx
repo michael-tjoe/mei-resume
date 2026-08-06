@@ -6,8 +6,10 @@ import SectionTitle from '@/components/SectionTitle';
 import Slider from '@/components/Slider';
 
 import CompanyName from './components/CompanyName';
-import { COMPANIES } from './constants/companies';
+import WithPhonePortofolioLayout from './components/WithPhonePortofolioLayout';
+import { COMPANIES, GEBRAK_PORTOFOLIO } from './constants/companies';
 import DesktopNavbar from '@/components/PortofolioNavigation/DesktopNavbar';
+import { PORTOFOLIO_NAV_RAIL_ID } from '@/providers/NavigationProvider';
 
 const CARD_CLASS = 'relative aspect-[206/258] overflow-hidden';
 const IMAGE_CLASS = 'object-cover';
@@ -33,16 +35,16 @@ function FeedSlider({ feeds }: { feeds: StaticImageData[] }) {
 
 export default function Portofolio() {
   return (
-    <section className="relative z-30 min-h-[2000px] w-full pb-14 desktop:min-w-[4000px]">
+    <section className="relative z-30 w-full pb-14 desktop:h-svh desktop:shrink-0 desktop:pb-0">
       <DesktopOnly>
-        <div className="absolute inset-y-0 left-0 z-(--znavbar) w-18">
-          <DesktopNavbar sticky invert />
+        <div id={PORTOFOLIO_NAV_RAIL_ID} className="absolute inset-y-0 left-0 z-(--znavbar) w-18">
+          <DesktopNavbar sticky invert text="portofolio" />
+        </div>
+        <div className="flex h-full shrink-0 grow flex-col pl-35.5">
+          <WithPhonePortofolioLayout {...GEBRAK_PORTOFOLIO} />
         </div>
       </DesktopOnly>
 
-      <DesktopOnly>
-        <SectionTitle id="portofolio" invert className="px-side pt-10 pb-5" text="portfolio" />
-      </DesktopOnly>
       <MobileOnly>
         <SectionTitle
           id="portofolio"
@@ -50,9 +52,6 @@ export default function Portofolio() {
           invert
           className="scroll-mt-[calc(var(--spacing)*12.25-20px)] px-side pt-10 pb-5"
         />
-      </MobileOnly>
-
-      <MobileOnly>
         <div className="pt-3 [&>div:not(:last-child)]:mb-7">
           {COMPANIES.map((company, index) => (
             <div key={index}>

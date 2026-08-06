@@ -1,6 +1,5 @@
-import { DesktopOnly } from '@/components/DesktopOnly';
 import { MobileOnly } from '@/components/MobileOnly';
-import DesktopNavbar from './DesktopNavbar';
+import DesktopNavbarParent from './DesktopNavbarParent';
 import MobileNavigation from './MobileNavigation';
 
 /** Hoisted static JSX (rendering-hoist-jsx). */
@@ -10,17 +9,11 @@ const mobileNavbar = (
   </MobileOnly>
 );
 
-const desktopNavbar = (
-  <DesktopOnly>
-    <DesktopNavbar />
-  </DesktopOnly>
-);
-
 export default function PortofolioNavigation() {
   return (
     <>
       {mobileNavbar}
-      {desktopNavbar}
+      <DesktopNavbarParent />
     </>
   );
 }

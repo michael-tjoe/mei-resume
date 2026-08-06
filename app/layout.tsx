@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { Meie_Script, Sora } from "next/font/google";
+import { NavigationProvider } from "@/providers/NavigationProvider";
 import { ViewportProvider } from "@/providers/ViewportProvider";
 import "./globals.css";
 
@@ -41,7 +42,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full">
         <ViewportProvider initialIsDesktop={initialIsDesktop}>
-          {children}
+          <NavigationProvider>{children}</NavigationProvider>
         </ViewportProvider>
       </body>
     </html>

@@ -254,6 +254,105 @@ pre {
   font-family: var(--mono);
 }
 
+/* Overlap / stacking simulator (lesson 05) */
+.overlap-sim {
+  /* Translate distance; 0 = rail separated (~EARLY_W from stage left). */
+  --rail-shift: 0px;
+  --early-w: 140px;
+  --fixed-bg: #c9b08d;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  overflow: hidden;
+  margin: 1rem 0 0.5rem;
+}
+
+.overlap-sim-stage {
+  position: relative;
+  height: 140px;
+  background: #faf3e7;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.overlap-sim-track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  /* Early strip + one stage-width portfolio panel. */
+  display: flex;
+  width: calc(var(--early-w) + 100%);
+  transform: translateX(calc(-1 * var(--rail-shift)));
+}
+
+.overlap-sim-panel {
+  display: flex;
+  align-items: stretch;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.overlap-sim-panel.early {
+  flex: 0 0 var(--early-w);
+  background: #e8dfd0;
+  color: #5c5c5c;
+  padding: 0.75rem;
+}
+
+.overlap-sim-panel.portfolio {
+  flex: 1 0 0;
+  min-width: 0;
+  background: #321000;
+  color: #faf3e7;
+  position: relative;
+}
+
+.overlap-sim-rail {
+  width: 48px;
+  background: #321000;
+  border-right: 1px solid rgba(250, 243, 231, 0.25);
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.overlap-sim-fixed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 100%;
+  background: var(--fixed-bg);
+  transition: background-color 300ms ease;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12);
+}
+
+.overlap-sim-fixed.is-invert {
+  --fixed-bg: #321000;
+}
+
+.overlap-sim .sim-controls label {
+  color: var(--muted);
+}
+
+.overlap-sim .sim-readout {
+  color: var(--muted);
+}
+
 footer.lesson-footer {
   margin-top: 3rem;
   padding-top: 1rem;
