@@ -517,6 +517,133 @@ pre {
   }
 }
 
+/* Double-rAF enter simulator (MobileNavbarMenu lesson) */
+.raf-sim {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  overflow: hidden;
+  margin: 1rem 0 0.5rem;
+}
+
+.raf-sim-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+}
+
+.raf-sim-modes label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.raf-sim-stage {
+  position: relative;
+  height: 180px;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+.raf-sim-stage[data-mounted="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.raf-sim-panel {
+  position: absolute;
+  inset-inline: 12px;
+  top: 0;
+  z-index: 1;
+  padding: 1.1rem 1rem 1.25rem;
+  border-radius: 0 0 18px 18px;
+  background: #c4a574;
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  transform: translate3d(0, -100%, 0);
+  transition: transform 400ms ease-out;
+  backface-visibility: hidden;
+}
+
+.raf-sim-panel.is-entered {
+  transform: translate3d(0, 0, 0);
+}
+
+.raf-sim-panel[hidden] {
+  display: none;
+}
+
+.raf-sim-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: #888;
+  z-index: 0;
+}
+
+.raf-sim-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.raf-sim-actions button {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.raf-sim-actions button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.raf-sim-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.raf-sim-actions button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.raf-sim-log {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  max-height: 6.5rem;
+  overflow: auto;
+  padding: 0.65rem 1rem 0.85rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  background: #fbfaf7;
+}
+
+.raf-sim-log > div {
+  margin-bottom: 0.2rem;
+}
+
 footer.lesson-footer {
   margin-top: 3rem;
   padding-top: 1rem;

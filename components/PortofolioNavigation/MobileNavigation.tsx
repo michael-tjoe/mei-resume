@@ -1,12 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
 import HamburgerIcon from './HamburgerIcon';
-import MobileNavbarMenu from './MobileNavbarMenu';
+import { scheduleAfterLoad } from '@/hooks/scheduleIdle';
+
+// One import() call site so idle preload and next/dynamic share the same chunk.
+const loadMobileNavbarMenu = () => import('./MobileNavbarMenu');
+
+// Defer menu chunk until first open (bundle-dynamic-imports / bundle-conditional).
+const MobileNavbarMenu = dynamic(loadMobileNavbarMenu, {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function MobileNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // Keep mounted after first open so close transition can finish.
+  const [hasOpened, setHasOpened] = useState(false);
+
+  // Prefetch after all page resources load, then on idle (bundle-preload).
+  useEffect(() => {
+    return scheduleAfterLoad(() => {
+      void loadMobileNavbarMenu();
+    });
+  }, []);
 
   return (
     <nav
@@ -18,12 +37,22 @@ export default function MobileNavigation() {
         className="relative flex cursor-pointer flex-col items-center justify-center text-white transition-opacity"
         aria-label="Open menu"
         aria-expanded={isMenuOpen}
-        onClick={() => setIsMenuOpen(true)}
+        onPointerEnter={loadMobileNavbarMenu}
+        onFocus={loadMobileNavbarMenu}
+        onClick={() => {
+          setHasOpened(true);
+          setIsMenuOpen(true);
+        }}
       >
         <HamburgerIcon />
       </button>
 
-      <MobileNavbarMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      {hasOpened ? (
+        <MobileNavbarMenu
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
+      ) : null}
     </nav>
   );
 }

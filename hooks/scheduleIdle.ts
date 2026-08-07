@@ -16,3 +16,29 @@ export function cancelIdle(id: number) {
   }
   window.clearTimeout(id);
 }
+
+/**
+ * Run after `window` `load` (all subresources finished), then on idle.
+ * Returns a cancel function for effect cleanup.
+ */
+export function scheduleAfterLoad(cb: () => void): () => void {
+  let idleId: number | undefined;
+  let cancelled = false;
+
+  const run = () => {
+    if (cancelled) return;
+    idleId = scheduleIdle(cb);
+  };
+
+  if (document.readyState === 'complete') {
+    run();
+  } else {
+    window.addEventListener('load', run);
+  }
+
+  return () => {
+    cancelled = true;
+    window.removeEventListener('load', run);
+    if (idleId !== undefined) cancelIdle(idleId);
+  };
+}

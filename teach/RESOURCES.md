@@ -1,6 +1,16 @@
-# Mission + DOM events + MorphSVG hover + Serwist Resources
+# Mission + DOM events + MorphSVG hover + Serwist + rAF menu Resources
 
 ## Knowledge
+
+### requestAnimationFrame / enter transitions
+- [MDN: Window.requestAnimationFrame()](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame)
+  Callback before next repaint; one-shot; refresh-rate synced; pauses in background tabs. Use for: any question about when `MobileNavbarMenu`’s rAF runs relative to paint.
+- [Jake Archibald: In The Loop (JSConf.Asia 2018)](https://www.youtube.com/watch?v=cCOL7MC8GrI)
+  Canonical walkthrough of tasks, microtasks, rAF, and rendering. Use for: why nesting two rAFs waits for a paint between mount and `setEntered(true)`.
+- [Alex MacArthur: Using Forced Reflows and the Event Loop to Slide Open a Box](https://macarthur.me/posts/box)
+  Forced reflow vs nested rAF for CSS enter transitions. Use for: comparing alternatives to the double-rAF pattern in this menu.
+- [Video.js PR #755 — double-RAF for entry animations](https://github.com/videojs/v10/pull/755)
+  Same failure mode in production: single rAF clears starting styles in the same paint. Use for: external confirmation of the pattern.
 
 ### Service workers / Serwist
 - [web.dev: The service worker lifecycle (Jake Archibald)](https://web.dev/articles/service-worker-lifecycle)
@@ -66,6 +76,8 @@
   Official, high-signal help from GreenSock staff and experienced users. Use for: sticky pin bugs, MorphSVG shapeIndex weirdness, React cleanup edge cases.
 - [Stack Overflow — javascript / events](https://stackoverflow.com/questions/tagged/javascript+events)
   Practical Q&A on capture/bubble and passive scroll jank. Use for: “why doesn’t preventDefault work?” debugging after reading MDN.
+- [Stack Overflow — requestanimationframe](https://stackoverflow.com/questions/tagged/requestanimationframe)
+  Timing / double-rAF / transition enter bugs. Use for: comparing forced reflow vs nested rAF after reading MDN + In The Loop.
 - [Stack Overflow — service-worker](https://stackoverflow.com/questions/tagged/service-worker)
   Practical Q&A on scope failures, stuck waiting workers, and update races. Use for: debugging after reading web.dev lifecycle.
 - [Serwist GitHub discussions](https://github.com/serwist/serwist/discussions)

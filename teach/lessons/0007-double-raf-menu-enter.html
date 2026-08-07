@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 07 — Double rAF menu enter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Lesson 07 · MobileNavbarMenu digression</p>
+        <h1>Two frames so the slide can start</h1>
+        <p class="lede">
+          One idea: CSS transitions need a painted
+          <em>from</em> state.
+          <code>requestAnimationFrame</code> runs
+          <em>before</em> paint — so this menu nests two of them before flipping
+          <code>entered</code> to open.
+        </p>
+        <p class="meta">
+          ~7 minutes · tied to
+          <code>components/PortofolioNavigation/MobileNavbarMenu.tsx</code>
+        </p>
+      </header>
+
+      <h2>Two flags, one job each</h2>
+      <ul>
+        <li>
+          <code>shouldRender</code> — is the portal in the DOM at all?
+        </li>
+        <li>
+          <code>entered</code> — which transform class is on the sheet?
+          <code>false</code> → <code>-translate-y-full</code>,
+          <code>true</code> → <code>translate-y-0</code>.
+        </li>
+      </ul>
+      <p>
+        On open, render mounts with <code>entered === false</code> (off-screen).
+        Only later does the effect set <code>entered</code> true so the
+        compositor can interpolate. That “later” is the rAF dance.
+      </p>
+
+      <h2>What rAF actually schedules</h2>
+      <p>
+        Per
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame"
+          >MDN <code>requestAnimationFrame</code></a
+        >, the callback runs
+        <strong>before the next repaint</strong> — not after. It is one-shot;
+        nesting another call queues work for the
+        <em>following</em> frame’s pre-paint slot.
+      </p>
+      <div class="note">
+        Jake Archibald’s
+        <a href="https://www.youtube.com/watch?v=cCOL7MC8GrI"
+          >In The Loop</a
+        >
+        (JSConf.Asia) walks the same pipeline: tasks → microtasks → rAF →
+        style/layout/paint. Anything you schedule
+        <em>inside</em> a rAF callback runs on the
+        <em>next</em> frame’s rAF batch — after this frame has painted.
+      </div>
+
+      <h2>Why this component nests two</h2>
+      <pre>// isOpen path — MobileNavbarMenu.tsx
+outerId = requestAnimationFrame(() => {
+  if (prefersReducedMotion()) {
+    setEntered(true);
+    return;
+  }
+  innerId = requestAnimationFrame(() => setEntered(true));
+});</pre>
+      <ol>
+        <li>
+          Mount paints (or is about to paint) with closed styles —
+          <code>-translate-y-full</code>, overlay <code>opacity-0</code>.
+        </li>
+        <li>
+          Outer rAF runs <em>before</em> that paint. Flipping
+          <code>entered</code> here can still land in the
+          <strong>same</strong> paint as mount — no from→to, sheet pops in.
+        </li>
+        <li>
+          Inner rAF runs before the <em>next</em> paint. By then the browser has
+          committed the closed frame, so <code>setEntered(true)</code> starts a
+          real CSS transition.
+        </li>
+      </ol>
+      <p>
+        The comment in the file says it plainly: paint the closed frame first,
+        then flip — otherwise both states land in one paint.
+        Libraries hit the same bug; e.g. Video.js’s transition open needed
+        <a href="https://github.com/videojs/v10/pull/755">double-rAF</a>
+        for the same reason.
+      </p>
+
+      <h2>Feel it</h2>
+      <p>
+        Open with <strong>Instant</strong> (jumps), then <strong>Double</strong>
+        (slides). <strong>Single</strong> is the unreliable middle — sometimes
+        slides, sometimes pops, depending on timing.
+      </p>
+      <div class="raf-sim" id="raf-sim" data-raf-sim>
+        <div class="raf-sim-modes">
+          <label>
+            <input type="radio" name="raf-mode" value="instant" />
+            Instant (same turn)
+          </label>
+          <label>
+            <input type="radio" name="raf-mode" value="single" />
+            Single rAF
+          </label>
+          <label>
+            <input type="radio" name="raf-mode" value="double" checked />
+            Double rAF
+          </label>
+        </div>
+        <div class="raf-sim-stage" data-raf-stage data-mounted="false">
+          <div class="raf-sim-panel" data-raf-panel hidden>
+            menu sheet
+            <div style="font-weight: 400; font-size: 0.75rem; margin-top: 0.35rem; opacity: 0.85">
+              <code>entered</code> drives translateY
+            </div>
+          </div>
+          <div class="raf-sim-hint">viewport · body portal target</div>
+        </div>
+        <div class="raf-sim-actions">
+          <button type="button" class="primary" data-action="open">Open</button>
+          <button type="button" data-action="close" disabled>Close</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+        <div class="raf-sim-log" data-raf-log></div>
+      </div>
+
+      <h2>Close is asymmetric</h2>
+      <p>
+        On close, the sheet is <em>already</em> painted open. One
+        <code>setEntered(false)</code> is enough to start the exit transition.
+        Unmount waits for <code>transitionend</code> on
+        <code>transform</code> (or a <code>ANIM_MS + 50</code> timeout if that
+        event is skipped — background tab, etc.). Cleanup cancels pending rAF
+        ids and the fallback timer so rapid open/close cannot leave stale
+        flips.
+      </p>
+
+      <h2>Check yourself</h2>
+      <div class="card">
+        <p style="margin-top: 0">
+          Why nest two <code>requestAnimationFrame</code> calls before
+          <code>setEntered(true)</code> on open?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="rAF is one-shot per frame; nesting targets the next frame."
+          >
+            Force React to skip the exit path
+          </button>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Yes — outer runs before paint; inner runs after that paint."
+          >
+            Force one paint of off-screen state
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Opacity is separate; the gate is seeing closed transform first."
+          >
+            Force opacity ahead of transform work
+          </button>
+        </div>
+        <p class="feedback" data-feedback></p>
+      </div>
+
+      <div class="card">
+        <p style="margin-top: 0">
+          Why can close usually flip <code>entered</code> without a second nested
+          rAF?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Yes — open styles already painted; flip has a real from state."
+          >
+            Element already painted as open state
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Close still needs a from→to; the from is the open paint."
+          >
+            Browser never painted the open state
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Double nesting is for enter when mount and flip race one paint."
+          >
+            Double nesting only helps the close path
+          </button>
+        </div>
+        <p class="feedback" data-feedback></p>
+      </div>
+
+      <h2>Primary source</h2>
+      <p>
+        Read
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame"
+          >MDN: <code>window.requestAnimationFrame()</code></a
+        >
+        (callback before next repaint; one-shot). Then watch Jake Archibald’s
+        <a href="https://www.youtube.com/watch?v=cCOL7MC8GrI">In The Loop</a>
+        for where rAF sits vs tasks and paint. Map that onto the
+        <code>isOpen</code> branch in
+        <code>MobileNavbarMenu.tsx</code>.
+      </p>
+
+      <footer class="lesson-footer">
+        <p>
+          Ask follow-ups anytime — I’m your teacher for this digression. Next we
+          can dig into the render-time <code>setShouldRender</code> mount, the
+          <code>transitionend</code> guards, or how this pairs with
+          <code>prefers-reduced-motion</code>.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../reference/double-raf-enter-transition.html"
+              >Reference: double-rAF enter</a
+            >
+          </li>
+          <li>
+            <a href="./0005-stacking-vs-portaled-nav.html">Lesson 05 (portal nav)</a>
+          </li>
+          <li><a href="./0006-serwist-scope-lifecycle.html">Lesson 06</a></li>
+          <li><a href="../MISSION.md">Mission</a></li>
+          <li><a href="../RESOURCES.md">Resources</a></li>
+        </ul>
+      </footer>
+    </div>
+
+    <script src="../assets/quiz.js"></script>
+    <script src="../assets/raf-enter.js"></script>
+    <script>
+      TeachQuiz.wireAllQuizzes();
+      TeachRafEnter.mount(document.getElementById("raf-sim"));
+    </script>
+  </body>
+</html>

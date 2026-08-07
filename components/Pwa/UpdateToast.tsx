@@ -1,40 +1,24 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSerwist } from '@serwist/next/react'
 import { cn } from '@/lib/cn'
 
-const DISMISS_KEY = 'pwa-update-toast-dismissed'
-
+/**
+ * Prompt when a new SW is waiting. Refresh → skipWaiting → reload on controlling.
+ * @see https://serwist.pages.dev/docs/window#the-waiting-event
+ */
 export default function UpdateToast() {
   const { serwist } = useSerwist()
   const [visible, setVisible] = useState(false)
-  const refreshRequested = useRef(false)
 
   useEffect(() => {
     if (!serwist) return
 
-    const onWaiting = () => {
-      try {
-        if (sessionStorage.getItem(DISMISS_KEY) === '1') return
-      } catch {
-        // ignore
-      }
-      setVisible(true)
-    }
-
-    const onControlling = () => {
-      if (refreshRequested.current) {
-        window.location.reload()
-      }
-    }
+    const onWaiting = () => setVisible(true)
 
     serwist.addEventListener('waiting', onWaiting)
-    serwist.addEventListener('controlling', onControlling)
-    return () => {
-      serwist.removeEventListener('waiting', onWaiting)
-      serwist.removeEventListener('controlling', onControlling)
-    }
+    return () => serwist.removeEventListener('waiting', onWaiting)
   }, [serwist])
 
   if (!visible) return null
@@ -53,13 +37,18 @@ export default function UpdateToast() {
           type="button"
           className="shrink-0 font-sora text-sm font-semibold text-brand-tan underline-offset-2 hover:underline"
           onClick={() => {
-            try {
-              sessionStorage.removeItem(DISMISS_KEY)
-            } catch {
-              // ignore
-            }
-            refreshRequested.current = true
-            serwist?.messageSkipWaiting()
+            if (!serwist) return
+
+            // Reload once the waiting SW has taken control of this tab.
+            serwist.addEventListener('controlling', () => {
+              window.location.reload()
+            })
+            // Instructs the waiting SW to activate: posts { type: "SKIP_WAITING" };
+            // the worker then runs self.skipWaiting() (this line does not activate
+            // it in-page). Without this, the new SW stays waiting while the old one
+            // controls open tabs — a plain reload often won't activate it.
+            // No-op if nothing is waiting. Docs: https://serwist.pages.dev/docs/window/serwist
+            serwist.messageSkipWaiting()
           }}
         >
           Refresh
@@ -68,14 +57,7 @@ export default function UpdateToast() {
           type="button"
           aria-label="Dismiss"
           className="shrink-0 font-sora text-sm text-brand-cream/70 hover:text-brand-cream"
-          onClick={() => {
-            try {
-              sessionStorage.setItem(DISMISS_KEY, '1')
-            } catch {
-              // ignore
-            }
-            setVisible(false)
-          }}
+          onClick={() => setVisible(false)}
         >
           Dismiss
         </button>
