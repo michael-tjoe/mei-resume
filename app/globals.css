@@ -4,7 +4,7 @@
   /* Custom Breakpoints */
   --breakpoint-tablet: 600px;
   --breakpoint-tablet-lg: 768px;
-  --breakpoint-desktop: 840px;
+  --breakpoint-desktop: 1080px;
 
   /* Colors from Figma Style Guide */
   --color-brand-dark: #321000;
@@ -89,7 +89,7 @@
   }
 }
 
-@media (min-width: 840px) {
+@media (min-width: 1080px) {
   :root {
     --text-portofolio-name: 96px;
     --text-portofolio-name--line-height: 121px;

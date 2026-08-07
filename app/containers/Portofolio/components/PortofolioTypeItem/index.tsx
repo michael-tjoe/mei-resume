@@ -10,7 +10,7 @@ interface PortofolioTypeItemProps {
   name: string;
   subtitle: string;
   href: string;
-  hrefType?: 'ig' | 'website';
+  hrefType?: 'ig' | 'website' | '';
   className?: string;
 }
 
@@ -21,9 +21,13 @@ function PortofolioTypeItem({
   hrefType = 'ig',
   className,
 }: PortofolioTypeItemProps) {
-  const icon = hrefType === 'website' ? icBrowser : icInstagram;
+  const icon = hrefType === 'website' ? icBrowser : hrefType === 'ig' ? icInstagram : null;
   const ariaLabel =
-    hrefType === 'website' ? `Open ${name} website` : `Open ${name} on Instagram`;
+    hrefType === 'website'
+      ? `Open ${name} website`
+      : hrefType === 'ig'
+        ? `Open ${name} on Instagram`
+        : undefined;
 
   return (
     <div className={cn(styles.root, className)}>
@@ -32,15 +36,17 @@ function PortofolioTypeItem({
         <p className={styles.subtitle}>{subtitle}</p>
       </div>
 
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={styles.link}
-        aria-label={ariaLabel}
-      >
-        <Image src={icon} alt="" width={67} height={67} unoptimized className="size-full" />
-      </a>
+      {icon ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.link}
+          aria-label={ariaLabel}
+        >
+          <Image src={icon} alt="" width={67} height={67} unoptimized className="size-full" />
+        </a>
+      ) : null}
     </div>
   );
 }

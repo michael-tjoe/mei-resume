@@ -9,7 +9,7 @@ type WithPhonePortofolioLayoutProps = {
   name: string;
   subtitle: string;
   href: string;
-  hrefType: 'ig' | 'website';
+  hrefType: 'ig' | 'website' | '';
   desktopFeeds: StaticImageData[];
   collectionFrame: StaticImageData;
   className?: string;

@@ -8,9 +8,11 @@ import Slider from '@/components/Slider';
 import { cn } from '@/lib/cn';
 import { PORTOFOLIO_NAV_RAIL_ID } from '@/providers/NavigationProvider';
 
+import IllustrationPortofolioLayout from './components/IllustrationPortofolioLayout';
 import PortofolioTypeItem from './components/PortofolioTypeItem';
 import WithNotebookPortofolioLayout from './components/WithNotebookPortofolioLayout';
 import WithPhonePortofolioLayout from './components/WithPhonePortofolioLayout';
+import { ILLUSTRATIONS_PORTOFOLIO } from './constants/illustrations';
 import { SOCIAL_MEDIA_DESIGNS_PORTOFOLIO } from './constants/socialMediaDesigns';
 import { UI_DESIGNS_PORTOFOLIO } from './constants/uiDesigns';
 
@@ -58,6 +60,21 @@ export default function Portofolio() {
 
               return (
                 <WithNotebookPortofolioLayout
+                  key={portfolio.name}
+                  {...portfolio}
+                  className={cn(
+                    globalIndex % 2 === 1 && 'bg-white',
+                    globalIndex > 0 && 'pl-18',
+                  )}
+                />
+              );
+            })}
+            {ILLUSTRATIONS_PORTOFOLIO.map((portfolio, index) => {
+              const globalIndex =
+                SOCIAL_MEDIA_DESIGNS_PORTOFOLIO.length + UI_DESIGNS_PORTOFOLIO.length + index;
+
+              return (
+                <IllustrationPortofolioLayout
                   key={portfolio.name}
                   {...portfolio}
                   className={cn(

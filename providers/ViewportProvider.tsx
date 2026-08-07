@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useSyncExternalStore } from "react";
 
-const DESKTOP_MEDIA = "(min-width: 840px)";
+const DESKTOP_MEDIA = "(min-width: 1080px)";
 
 interface ViewportContextValue {
   isDesktop: boolean;

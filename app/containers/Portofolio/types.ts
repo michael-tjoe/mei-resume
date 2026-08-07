@@ -4,7 +4,7 @@ export type FeaturedCompanyBlock = {
   name: string;
   subtitle: string;
   href: string;
-  hrefType: 'ig' | 'website';
+  hrefType: 'ig' | 'website' | '';
   mobileFeeds: StaticImageData[];
   desktopFeeds: StaticImageData[];
   collectionFrame: StaticImageData;
