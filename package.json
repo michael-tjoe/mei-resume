@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -p none \"serwist build serwist.config.mjs --watch\" \"next dev\"",
+    "dev": "cross-env NEXT_PUBLIC_DISABLE_SW=1 next dev",
+    "dev:sw": "concurrently -p none \"serwist build serwist.config.mjs --watch\" \"next dev\"",
     "dev:once": "cross-env NODE_ENV=development serwist build serwist.config.mjs && next dev",
     "build": "next build && serwist build serwist.config.mjs",
     "start": "next start",

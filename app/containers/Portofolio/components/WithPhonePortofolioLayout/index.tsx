@@ -2,15 +2,16 @@ import Image, { type StaticImageData } from 'next/image';
 
 import { cn } from '@/lib/cn';
 
-import icInstagram from '../CompanyName/assets/ic-instagram.svg';
+import PortofolioTypeItem from '../PortofolioTypeItem';
 import sectionDivider from './assets/section-divider.svg';
 
 type WithPhonePortofolioLayoutProps = {
   name: string;
   subtitle: string;
   href: string;
+  hrefType: 'ig' | 'website';
   desktopFeeds: StaticImageData[];
-  phoneMockup: StaticImageData;
+  collectionFrame: StaticImageData;
   className?: string;
 };
 
@@ -26,10 +27,6 @@ const dividerImage = (
   />
 );
 
-const instagramIcon = (
-  <Image src={icInstagram} alt="" width={67} height={67} unoptimized className="size-full" />
-);
-
 function SectionDivider({ flip = false, className }: { flip?: boolean; className?: string }) {
   return (
     <div className={cn(flip && '-scale-y-100', className)} aria-hidden="true">
@@ -42,8 +39,9 @@ function WithPhonePortofolioLayout({
   name,
   subtitle,
   href,
+  hrefType,
   desktopFeeds,
-  phoneMockup,
+  collectionFrame,
   className,
 }: WithPhonePortofolioLayoutProps) {
   return (
@@ -57,21 +55,7 @@ function WithPhonePortofolioLayout({
 
       <div className="mt-8 flex shrink grow overflow-hidden pb-5">
         <div className="relative flex aspect-830/754 max-h-full max-w-full shrink-0 grow-0 flex-col">
-          <div className="flex shrink-0 items-center gap-3">
-            <div className="flex flex-col text-brand-dark">
-              <p className="text-2xl/normal font-bold">{name}</p>
-              <p className="text-xl/normal font-bold">{subtitle}</p>
-            </div>
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative block size-16.75 shrink-0 overflow-hidden transition-opacity hover:opacity-80"
-              aria-label={`Open ${name} on Instagram`}
-            >
-              {instagramIcon}
-            </a>
-          </div>
+          <PortofolioTypeItem name={name} subtitle={subtitle} href={href} hrefType={hrefType} />
 
           <div className="mt-5 grid size-full  grid-cols-4 grid-rows-3 gap-x-6 gap-y-3 overflow-hidden">
             {desktopFeeds.map((src, index) => (
@@ -84,7 +68,7 @@ function WithPhonePortofolioLayout({
 
         <div className="relative aspect-552/1275 h-full max-w-full shrink-0 grow">
           <Image
-            src={phoneMockup}
+            src={collectionFrame}
             alt={`${name} Instagram feed mockup`}
             width={1104}
             height={2160}

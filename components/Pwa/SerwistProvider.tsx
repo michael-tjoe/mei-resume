@@ -8,6 +8,7 @@ export default function SerwistProvider({ children }: { children: ReactNode }) {
   return (
     <SerwistReactProvider
       swUrl="/sw.js"
+      disable={process.env.NEXT_PUBLIC_DISABLE_SW === '1'}
       reloadOnOnline={false}
       // Passed to navigator.serviceWorker.register(): load /sw.js as a classic
       // script (not type: 'module'). Matches Serwist CLI output (bundled, no ESM).

@@ -8,9 +8,11 @@ import Slider from '@/components/Slider';
 import { cn } from '@/lib/cn';
 import { PORTOFOLIO_NAV_RAIL_ID } from '@/providers/NavigationProvider';
 
-import CompanyName from './components/CompanyName';
+import PortofolioTypeItem from './components/PortofolioTypeItem';
+import WithNotebookPortofolioLayout from './components/WithNotebookPortofolioLayout';
 import WithPhonePortofolioLayout from './components/WithPhonePortofolioLayout';
 import { SOCIAL_MEDIA_DESIGNS_PORTOFOLIO } from './constants/socialMediaDesigns';
+import { UI_DESIGNS_PORTOFOLIO } from './constants/uiDesigns';
 
 const CARD_CLASS = 'relative aspect-[206/258] overflow-hidden';
 const IMAGE_CLASS = 'object-cover';
@@ -51,6 +53,20 @@ export default function Portofolio() {
                 className={cn(index % 2 === 1 && 'bg-white', index > 0 && 'pl-18')}
               />
             ))}
+            {UI_DESIGNS_PORTOFOLIO.map((portfolio, index) => {
+              const globalIndex = SOCIAL_MEDIA_DESIGNS_PORTOFOLIO.length + index;
+
+              return (
+                <WithNotebookPortofolioLayout
+                  key={portfolio.name}
+                  {...portfolio}
+                  className={cn(
+                    globalIndex % 2 === 1 && 'bg-white',
+                    globalIndex > 0 && 'pl-18',
+                  )}
+                />
+              );
+            })}
           </div>
         </div>
       </DesktopOnly>
@@ -65,10 +81,11 @@ export default function Portofolio() {
         <div className="pt-3 [&>div:not(:last-child)]:mb-7">
           {SOCIAL_MEDIA_DESIGNS_PORTOFOLIO.map((portfolio) => (
             <div key={portfolio.name}>
-              <CompanyName
+              <PortofolioTypeItem
                 name={portfolio.name}
                 subtitle={portfolio.subtitle}
                 href={portfolio.href}
+                hrefType={portfolio.hrefType}
                 className="px-side"
               />
               <FeedSlider feeds={portfolio.mobileFeeds} />

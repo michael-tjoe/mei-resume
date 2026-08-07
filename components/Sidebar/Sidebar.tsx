@@ -7,6 +7,7 @@ import TypographyArt from '@/components/TypographyArt';
 import { useHorizontalScrollApi } from '@/components/HorizontalScroll';
 import { prefersReducedMotion } from '@/helpers/prefersReducedMotion';
 import { loadGsap } from '@/hooks/loadGsap';
+import { EXPERIENCES_SCROLL_Y, PORTOFOLIO_SCROLL_Y } from '@/constants/desktopNavScroll';
 import { cn } from '@/lib/cn';
 import gloves from './assets/gloves.png';
 import icClose from './assets/ic-close.svg';
@@ -21,8 +22,8 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { label: 'experiences', href: '#experiences', scrollY: 2420 },
-  { label: 'portfolio', href: '#portfolio' },
+  { label: 'experiences', href: '#experiences', scrollY: EXPERIENCES_SCROLL_Y },
+  { label: 'portfolio', href: '#portfolio', scrollY: PORTOFOLIO_SCROLL_Y },
   { label: 'contact', href: '#contact' },
 ] as const;
 
@@ -224,7 +225,7 @@ function Sidebar({ isOpen, onClose, invert = false, text = 'stefanny’s' }: Sid
           </nav>
 
           <div
-            className="pointer-events-none absolute bottom-12 right-14 h-45 w-[198.5px]"
+            className="pointer-events-none absolute right-14 bottom-12 h-45 w-[198.5px]"
             aria-hidden
           >
             {glovesImage}

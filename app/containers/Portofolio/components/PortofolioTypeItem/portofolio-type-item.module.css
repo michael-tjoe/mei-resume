@@ -1,0 +1,43 @@
+@reference '../../../../globals.css';
+
+.root {
+  @apply flex w-full items-center justify-between;
+}
+
+.text {
+  @apply flex flex-col items-start gap-0.5 text-brand-dark;
+}
+
+.name {
+  @apply text-[14px] leading-normal font-bold whitespace-nowrap;
+}
+
+.subtitle {
+  @apply text-[10px] leading-normal font-bold whitespace-nowrap;
+}
+
+.link {
+  @apply relative block size-12 shrink-0 overflow-hidden transition-opacity hover:opacity-80;
+}
+
+@media (min-width: 840px) {
+  .root {
+    @apply w-auto shrink-0 justify-start gap-3 self-start;
+  }
+
+  .text {
+    @apply gap-0;
+  }
+
+  .name {
+    @apply text-2xl/normal whitespace-normal;
+  }
+
+  .subtitle {
+    @apply text-xl/normal whitespace-normal;
+  }
+
+  .link {
+    @apply size-16.75;
+  }
+}
