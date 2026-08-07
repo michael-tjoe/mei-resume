@@ -3,6 +3,7 @@
 import { createContext, useContext, useMemo } from 'react';
 import { useViewport } from '@/providers/ViewportProvider';
 import { useHorizontalScroll } from '@/hooks/useHorizontalScroll';
+import { useGestureDetector } from '@/hooks/useGestureDetector';
 
 type HorizontalScrollContextValue = {
   scrollTo: (scrollY: number) => void;
@@ -17,6 +18,8 @@ export function useHorizontalScrollApi(): HorizontalScrollContextValue {
 export default function HorizontalScroll({ children }: { children: React.ReactNode }) {
   const { isDesktop } = useViewport();
   const { spacerRef, containerRef, panelsRef, scrollTo } = useHorizontalScroll(isDesktop);
+
+  useGestureDetector({ enabled: isDesktop });
 
   const value = useMemo(() => ({ scrollTo }), [scrollTo]);
 

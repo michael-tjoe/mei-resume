@@ -7,8 +7,7 @@ import { useEventListener } from '@/hooks/useEventListener';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Flip to false (or remove) when done debugging. */
-const DEBUG_HORIZONTAL_SCROLL = true;
+const DEBUG_HORIZONTAL_SCROLL = process.env.NODE_ENV !== 'production';
 
 type UseHorizontalScrollResult = {
   spacerRef: RefObject<HTMLDivElement | null>;

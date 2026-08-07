@@ -117,6 +117,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Block browser history swipe (back/forward) on horizontal gestures. */
+html,
+body {
+  overscroll-behavior-x: none;
+}
+
+/* Keep horizontal swipe gestures from being stolen by native image drag. */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
