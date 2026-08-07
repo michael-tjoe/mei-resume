@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reference — Serwist scope &amp; lifecycle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+    <style>
+      .flow {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        line-height: 1.6;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+      }
+      .glossary dt {
+        font-family: var(--sans);
+        font-weight: 600;
+        margin-top: 0.85rem;
+      }
+      .glossary dd {
+        margin: 0.2rem 0 0;
+        color: var(--muted);
+      }
+      table.compact {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--sans);
+        font-size: 0.9rem;
+        margin: 1rem 0;
+      }
+      table.compact th,
+      table.compact td {
+        border: 1px solid var(--line);
+        padding: 0.5rem 0.65rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      table.compact th {
+        background: #f3efe6;
+        font-weight: 600;
+      }
+      code.file {
+        font-size: 0.8em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Reference · Serwist</p>
+        <h1>Scope &amp; lifecycle cheat sheet</h1>
+        <p class="lede">
+          Compressed map of how this resume’s service worker registers, what it
+          can control, and when a new version takes over.
+        </p>
+      </header>
+
+      <h2>This repo’s wiring</h2>
+      <table class="compact">
+        <thead>
+          <tr>
+            <th>Piece</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="file">components/Pwa/SerwistProvider.tsx</code></td>
+            <td>
+              Production-only <code>register("/serwist/sw.js")</code> via
+              <code>@serwist/turbopack/react</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code class="file">app/serwist/[path]/route.ts</code></td>
+            <td>
+              Builds <code>app/sw.ts</code>; serves SW with
+              <code>Service-Worker-Allowed: /</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code class="file">app/sw.ts</code></td>
+            <td>
+              <code>skipWaiting: false</code>,
+              <code>clientsClaim: true</code>, precache + runtime +
+              <code>/~offline</code> fallback
+            </td>
+          </tr>
+          <tr>
+            <td><code class="file">components/Pwa/UpdateToast.tsx</code></td>
+            <td>
+              On <code>waiting</code> → UI; Refresh →
+              <code>messageSkipWaiting()</code>; on <code>controlling</code> →
+              reload
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Scope</h2>
+      <div class="flow">
+        script URL: /serwist/sw.js<br />
+        default max scope: /serwist/<br />
+        + header Service-Worker-Allowed: /<br />
+        → registration may use scope /
+      </div>
+      <p>
+        Sources:
+        <a href="https://web.dev/articles/service-worker-lifecycle"
+          >web.dev (default scope)</a
+        >,
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Service-Worker-Allowed"
+          >MDN Service-Worker-Allowed</a
+        >.
+      </p>
+
+      <h2>Lifecycle flow</h2>
+      <div class="flow">
+        register → download/parse<br />
+        → install (precache __SW_MANIFEST)<br />
+        → [waiting if old SW still has clients]<br />
+        → activate (cleanup; clients.claim if configured)<br />
+        → fetch / push / sync…
+      </div>
+      <p>
+        Update check (byte-diff of SW script) → new install in parallel →
+        waiting until zero old clients <em>or</em>
+        <code>skipWaiting()</code>.
+      </p>
+
+      <h2>This app’s knobs</h2>
+      <dl class="glossary">
+        <dt><code>skipWaiting: false</code></dt>
+        <dd>
+          New worker waits. User (or “close all tabs”) promotes it. Avoids
+          instant mid-session swap.
+        </dd>
+        <dt><code>messageSkipWaiting()</code></dt>
+        <dd>
+          Posts <code>SKIP_WAITING</code>; Serwist calls
+          <code>self.skipWaiting()</code>. Used by UpdateToast Refresh.
+        </dd>
+        <dt><code>clientsClaim: true</code></dt>
+        <dd>
+          On activate, claim open clients so they become controlled without
+          relying only on a later navigation.
+        </dd>
+        <dt>controlled vs in-scope</dt>
+        <dd>
+          In-scope = URL under registration scope. Controlled =
+          <code>navigator.serviceWorker.controller</code> is set; fetches go
+          through the worker.
+        </dd>
+      </dl>
+
+      <h2>DevTools quick checks</h2>
+      <ul>
+        <li>Application → Service Workers: installing / waiting / active</li>
+        <li>Response headers on <code>/serwist/sw.js</code>: look for Allowed</li>
+        <li>“Update on reload” for painful wait-during-dev</li>
+        <li>Shift-reload bypasses the worker for one navigation</li>
+      </ul>
+
+      <footer class="lesson-footer">
+        <ul class="links">
+          <li>
+            <a href="../lessons/0006-serwist-scope-lifecycle.html">Lesson 06</a>
+          </li>
+          <li><a href="../RESOURCES.md">Resources</a></li>
+          <li><a href="../MISSION.md">Mission</a></li>
+        </ul>
+      </footer>
+    </div>
+  </body>
+</html>

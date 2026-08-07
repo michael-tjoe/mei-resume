@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useSerwist } from '@serwist/turbopack/react'
+import { useSerwist } from '@serwist/next/react'
 import { cn } from '@/lib/cn'
 
 const DISMISS_KEY = 'pwa-update-toast-dismissed'

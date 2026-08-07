@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 06 — Serwist scope &amp; lifecycle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/lesson.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site">
+        <p class="kicker">Lesson 06 · Serwist digression</p>
+        <h1>Scope decides where; lifecycle decides when</h1>
+        <p class="lede">
+          One idea: this app’s worker at
+          <code>/serwist/sw.js</code> controls the whole origin only because the
+          response header widens scope — and updates wait for you because
+          <code>skipWaiting: false</code>.
+        </p>
+        <p class="meta">
+          ~8 minutes · tied to <code>app/sw.ts</code>,
+          <code>SerwistProvider</code>, <code>UpdateToast</code>
+        </p>
+      </header>
+
+      <h2>The map in this repo</h2>
+      <ul>
+        <li>
+          <code>SerwistProvider</code> registers
+          <code>swUrl="/serwist/sw.js"</code> in production only.
+        </li>
+        <li>
+          <code>app/serwist/[path]/route.ts</code> builds
+          <code>app/sw.ts</code> and serves it (with the scope-widening header).
+        </li>
+        <li>
+          <code>app/sw.ts</code>:
+          <code>skipWaiting: false</code>,
+          <code>clientsClaim: true</code>, precache + runtime caches.
+        </li>
+        <li>
+          <code>UpdateToast</code> listens for <code>waiting</code>, then
+          <code>messageSkipWaiting()</code> on Refresh.
+        </li>
+      </ul>
+
+      <h2>Scope — who can this worker control?</h2>
+      <p>
+        Per
+        <a href="https://web.dev/articles/service-worker-lifecycle"
+          >web.dev lifecycle</a
+        >, default scope is <code>./</code> relative to the script URL. A worker
+        at <code>/serwist/sw.js</code> would normally only control
+        <code>/serwist/*</code> — useless for a site-wide PWA.
+      </p>
+      <div class="note">
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Service-Worker-Allowed"
+          >MDN: <code>Service-Worker-Allowed</code></a
+        >
+        lets the server broaden that path. Serwist’s Turbopack route sets
+        <code>Service-Worker-Allowed: /</code> on the SW response (see
+        <a href="https://serwist.pages.dev/docs/next/turbo"
+          >Serwist Turbopack docs</a
+        >), so registration with site-wide scope is allowed.
+      </div>
+      <p>
+        Once a page is <em>in scope</em> and <em>controlled</em>, its navigations
+        and fetches can go through the worker (your NetworkFirst pages, CacheFirst
+        static assets, offline document fallback).
+      </p>
+
+      <h2>Lifecycle — when does it take over?</h2>
+      <p>
+        From
+        <a href="https://web.dev/articles/service-worker-lifecycle"
+          >Jake Archibald’s lifecycle article</a
+        >:
+      </p>
+      <ol>
+        <li>
+          <strong>install</strong> — first event; Serwist precaches
+          <code>self.__SW_MANIFEST</code> (and fails the install if that promise
+          rejects).
+        </li>
+        <li>
+          <strong>waiting</strong> — if an older worker still controls tabs, the
+          new one sits here until those clients go away
+          <em>or</em> someone calls <code>skipWaiting()</code>.
+        </li>
+        <li>
+          <strong>activate</strong> — safe to clean old caches; with
+          <code>clientsClaim: true</code>, Serwist claims open clients so they
+          become controlled without needing a second navigation in many cases.
+        </li>
+      </ol>
+      <div class="note">
+        This app sets <code>skipWaiting: false</code> on purpose. Serwist still
+        listens for a <code>SKIP_WAITING</code> message —
+        <code>UpdateToast</code>’s Refresh button calls
+        <code>messageSkipWaiting()</code>, then reloads on
+        <code>controlling</code>. That matches the “user chooses when to flip”
+        pattern in the
+        <a href="https://serwist.pages.dev/docs/serwist/core/serwist"
+          >Serwist class docs</a
+        >.
+      </div>
+
+      <h2>Feel it</h2>
+      <p>
+        Register → Update (new version waits) → Refresh toast (skip waiting) or
+        Close tabs. Watch the three registration slots and the client line.
+      </p>
+      <div class="sw-sim" id="sw-sim" data-sw-sim>
+        <div class="sw-sim-scope" data-sw-scope></div>
+        <div class="sw-sim-slots">
+          <div class="sw-sim-slot">
+            <div class="sw-sim-slot-label">installing</div>
+            <div class="sw-sim-slot-value" data-slot="installing">—</div>
+          </div>
+          <div class="sw-sim-slot">
+            <div class="sw-sim-slot-label">waiting</div>
+            <div class="sw-sim-slot-value" data-slot="waiting">—</div>
+          </div>
+          <div class="sw-sim-slot">
+            <div class="sw-sim-slot-label">active</div>
+            <div class="sw-sim-slot-value" data-slot="active">—</div>
+          </div>
+        </div>
+        <div class="sw-sim-client" data-sw-client>uncontrolled</div>
+        <div class="sw-sim-toast" data-sw-toast hidden>
+          <span>New version available</span>
+          <button type="button" class="primary" data-action="skip">
+            Refresh
+          </button>
+        </div>
+        <div class="sw-sim-actions">
+          <button type="button" class="primary" data-action="register">
+            Register SW
+          </button>
+          <button type="button" data-action="update" disabled>Ship update</button>
+          <button type="button" data-action="close-tabs" disabled>
+            Close all tabs
+          </button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+        <div class="sw-sim-log" data-sw-log></div>
+      </div>
+
+      <h2>Check yourself</h2>
+      <div class="card">
+        <p style="margin-top: 0">
+          With <code>skipWaiting: false</code> and an open tab still controlled by
+          v1, what happens right after v2 finishes install?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="That would require skipWaiting true or a SKIP_WAITING message."
+          >
+            Activates and claims open tabs
+          </button>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Yes — it waits until tabs close or UpdateToast skips waiting."
+          >
+            Stays waiting until tabs clear
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="A failed install becomes redundant; a success waits."
+          >
+            Fails install and turns redundant
+          </button>
+        </div>
+        <p class="feedback" data-feedback></p>
+      </div>
+
+      <div class="card">
+        <p style="margin-top: 0">
+          Why can <code>/serwist/sw.js</code> control <code>/</code> in this app?
+        </p>
+        <div class="quiz" data-quiz>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="Default scope follows the script directory: /serwist/."
+          >
+            Default scope is always site root
+          </button>
+          <button
+            type="button"
+            data-correct="true"
+            data-ok="Yes — Serwist serves Service-Worker-Allowed: / on the script."
+          >
+            Response header widens allowed scope
+          </button>
+          <button
+            type="button"
+            data-correct="false"
+            data-bad="clientsClaim takes control of clients; it does not widen path scope."
+          >
+            clientsClaim widens the path scope
+          </button>
+        </div>
+        <p class="feedback" data-feedback></p>
+      </div>
+
+      <h2>Primary source</h2>
+      <p>
+        Read
+        <a href="https://web.dev/articles/service-worker-lifecycle"
+          >The service worker lifecycle</a
+        >
+        (web.dev / Jake Archibald) — especially “Scope and control,” “Waiting,”
+        and “Skip the waiting phase.” Then glance at
+        <code>skipWaiting: false</code> / <code>clientsClaim: true</code> in
+        <code>app/sw.ts</code> and the <code>waiting</code> /
+        <code>messageSkipWaiting</code> path in
+        <code>components/Pwa/UpdateToast.tsx</code>.
+      </p>
+
+      <footer class="lesson-footer">
+        <p>
+          Ask follow-ups anytime — I’m your teacher for this digression. Next we
+          can unpack precache vs runtime caching, the <code>/~offline</code>
+          fallback, or why registration is production-only.
+        </p>
+        <ul class="links">
+          <li>
+            <a href="../reference/serwist-sw-scope-lifecycle.html"
+              >Reference: scope &amp; lifecycle</a
+            >
+          </li>
+          <li><a href="./0005-stacking-vs-portaled-nav.html">Lesson 05</a></li>
+          <li><a href="../MISSION.md">Mission</a></li>
+          <li><a href="../RESOURCES.md">Resources</a></li>
+        </ul>
+      </footer>
+    </div>
+
+    <script src="../assets/quiz.js"></script>
+    <script src="../assets/sw-lifecycle.js"></script>
+    <script>
+      TeachQuiz.wireAllQuizzes();
+      TeachSwLifecycle.mount(document.getElementById("sw-sim"));
+    </script>
+  </body>
+</html>

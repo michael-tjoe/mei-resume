@@ -1,6 +1,7 @@
 # Notes
 
 - Teaching workspace root is `teach/` (not the repo root). Cursor rule: `.cursor/rules/teach-workspace.mdc`.
+- Digression (2026-08-07): user asked `/teach` on Serwist service workers — scope + lifecycle, tied to `app/sw.ts`, `SerwistProvider`, `UpdateToast`. Mission still HorizontalScroll unless they confirm expanding to “own the PWA/Serwist setup.” Next possible beats after L06: precache vs runtime caching, offline fallback (`/~offline`), or production-only registration.
 - User pointed at `components/HorizontalScroll/index.tsx` lines 19–72 and asked how the effect works.
 - When asked why (own it / reuse / general ScrollTrigger), they replied “yes” — interpreted as go ahead with owning this resume component as the mission. Confirm if they later want a broader GSAP track.
 - Prefer lessons that map directly onto their two refs: `containerRef` (pinned) and `panelsRef` (translated).

@@ -1,6 +1,20 @@
-# Mission + DOM events + MorphSVG hover Resources
+# Mission + DOM events + MorphSVG hover + Serwist Resources
 
 ## Knowledge
+
+### Service workers / Serwist
+- [web.dev: The service worker lifecycle (Jake Archibald)](https://web.dev/articles/service-worker-lifecycle)
+  Canonical explanation of install → waiting → activate, `skipWaiting`, `clients.claim`, and update intent. Use for: any lifecycle question about this app’s SW.
+- [MDN: Using Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers)
+  Registration, install/activate events, `waitUntil`. Use for: API-level details after web.dev’s narrative.
+- [MDN: Service-Worker-Allowed](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Service-Worker-Allowed)
+  How a SW script under a subpath can legally register with a broader `scope`. Use for: why `/serwist/sw.js` can control `/`.
+- [Serwist: The Serwist class](https://serwist.pages.dev/docs/serwist/core/serwist)
+  Maps `skipWaiting` / `clientsClaim` / `SKIP_WAITING` message to native APIs. Use for: reading `app/sw.ts` options.
+- [Serwist: Turbopack (Next.js)](https://serwist.pages.dev/docs/next/turbo)
+  `createSerwistRoute`, `SerwistProvider` `swUrl`, precache glob patterns. Use for: wiring in this repo (`app/serwist/[path]/route.ts`).
+- [Serwist: Precaching assets](https://serwist.pages.dev/docs/serwist/guide/precaching)
+  Precache on install, cleanup on activate. Use for: what `__SW_MANIFEST` does during lifecycle.
 
 ### Horizontal scroll / GSAP
 - [Docs: ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/)
@@ -52,3 +66,7 @@
   Official, high-signal help from GreenSock staff and experienced users. Use for: sticky pin bugs, MorphSVG shapeIndex weirdness, React cleanup edge cases.
 - [Stack Overflow — javascript / events](https://stackoverflow.com/questions/tagged/javascript+events)
   Practical Q&A on capture/bubble and passive scroll jank. Use for: “why doesn’t preventDefault work?” debugging after reading MDN.
+- [Stack Overflow — service-worker](https://stackoverflow.com/questions/tagged/service-worker)
+  Practical Q&A on scope failures, stuck waiting workers, and update races. Use for: debugging after reading web.dev lifecycle.
+- [Serwist GitHub discussions](https://github.com/serwist/serwist/discussions)
+  Library-specific help for Next/Turbopack integration. Use for: `@serwist/turbopack` quirks not covered in MDN.
