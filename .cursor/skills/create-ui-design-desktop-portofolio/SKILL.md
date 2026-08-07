@@ -41,16 +41,22 @@ app/containers/Portofolio/assets/{companyName}UiDesign/collectionFrame.png
   mobileFeeds: [],
   desktopFeeds: /* list of image from the folder */,
   desktopFeedAspectRatios: /* list of image aspect ratio from the folder */,
+  // Always include — default notebook layout ratio
+  aspectRatio: '1965/1080',
   collectionFrame: /* import from {companyName}UiDesign/collectionFrame.png */,
   collectionFrameAspectRatio: /* "{width}/{height}" from collectionFrame.png */,
+  // Optional — defaults to { right: 0, bottom: 0 }
+  collectionFramePosition: { right: 0, bottom: 0 },
 }
 ```
 
 Also set `hrefType: 'website'` so the object satisfies `NotebookCompanyBlock`
 (required by `FeaturedCompanyBlock`). Leave `href` empty unless the user provides
-one. Always include `collectionFrame` and `collectionFrameAspectRatio` when
-`{companyName}UiDesign/collectionFrame.png` exists (import the image, measure
-its pixels, and set both fields).
+one. Always include `aspectRatio: '1965/1080'` (override only when the layout
+needs a different notebook ratio). Always include `collectionFrame` and
+`collectionFrameAspectRatio` when `{companyName}UiDesign/collectionFrame.png`
+exists (import the image, measure its pixels, and set both fields). Omit
+`collectionFramePosition` unless the layout needs a non-default value.
 
 ## Workflow
 
@@ -128,6 +134,7 @@ export const {COMPANY}_UI_PORTOFOLIO: NotebookCompanyBlock = {
   mobileFeeds: [],
   desktopFeeds: {COMPANY}_UI_FEEDS,
   desktopFeedAspectRatios: ['W1/H1', 'W2/H2', 'W3/H3'],
+  aspectRatio: '1965/1080',
   collectionFrame: {companyName}CollectionFrame,
   collectionFrameAspectRatio: 'WF/HF',
 };
@@ -151,11 +158,13 @@ Append `{COMPANY}_UI_PORTOFOLIO` to `UI_DESIGNS_PORTOFOLIO`.
 | Feeds const | `ICE_BSD_UI_FEEDS` |
 | Export | `ICE_BSD_UI_PORTOFOLIO` |
 | `name` | `ICE BSD` (or user-provided) |
+| `aspectRatio` | `'1965/1080'` (default; always include) |
 | `collectionFrameAspectRatio` | `'2548/2160'` (from measured pixels) |
 
 ## Do not
 
 - Invent `href`, Instagram handles, or `collectionFrame` without assets/user input.
+- Omit `aspectRatio` — always set it (default `'1965/1080'`).
 - Skip `collectionFrame` or `collectionFrameAspectRatio` when `collectionFrame.png`
   exists in the company folder.
 - Copy a desktop feed ratio into `collectionFrameAspectRatio` — always measure the

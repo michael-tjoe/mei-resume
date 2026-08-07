@@ -9,6 +9,9 @@ type WithNotebookPortofolioLayoutProps = NotebookCompanyBlock & {
   className?: string;
 };
 
+const DEFAULT_ASPECT_RATIO = '1965/1080';
+const DEFAULT_COLLECTION_FRAME_POSITION = { right: 0, bottom: 0 } as const;
+
 function WithNotebookPortofolioLayout({
   name,
   subtitle,
@@ -16,19 +19,24 @@ function WithNotebookPortofolioLayout({
   hrefType,
   desktopFeeds,
   desktopFeedAspectRatios,
+  aspectRatio = DEFAULT_ASPECT_RATIO,
   collectionFrame,
   collectionFrameAspectRatio,
+  collectionFramePosition,
   className,
 }: WithNotebookPortofolioLayoutProps) {
   const [firstFeed, ...restFeeds] = desktopFeeds.slice(0, 3);
   const [firstAspectRatio, ...restAspectRatios] = desktopFeedAspectRatios;
+  const frameRight = collectionFramePosition?.right ?? DEFAULT_COLLECTION_FRAME_POSITION.right;
+  const frameBottom = collectionFramePosition?.bottom ?? DEFAULT_COLLECTION_FRAME_POSITION.bottom;
 
   return (
     <div
       className={cn(
-        'relative flex aspect-1965/1080 h-full max-w-full shrink-0 flex-row items-center gap-6 overflow-hidden',
+        'relative flex h-full max-w-full shrink-0 flex-row items-center gap-6 overflow-hidden',
         className,
       )}
+      style={{ aspectRatio }}
     >
       <div className="relative flex h-full shrink-0 grow-0 flex-col overflow-hidden">
         <PortofolioTypeItem
@@ -69,7 +77,7 @@ function WithNotebookPortofolioLayout({
               src={feed}
               alt={`${name} UI design ${index + 2}`}
               fill
-              className="h-full max-w-full object-cover object-center"
+              className="h-full max-w-full object-cover object-top-left"
               unoptimized
             />
           </div>
@@ -78,14 +86,18 @@ function WithNotebookPortofolioLayout({
 
       {collectionFrame && collectionFrameAspectRatio ? (
         <div
-          className="z-20 pointer-events-none absolute right-0 bottom-0 h-full"
-          style={{ aspectRatio: collectionFrameAspectRatio }}
+          className="z-20 pointer-events-none absolute h-full"
+          style={{
+            aspectRatio: collectionFrameAspectRatio,
+            right: frameRight,
+            bottom: frameBottom,
+          }}
         >
           <Image
             src={collectionFrame}
             alt={`${name} collection frame`}
             fill
-            className="object-contain object-bottom-right"
+            className="object-contain object-center-right"
             unoptimized
           />
         </div>
