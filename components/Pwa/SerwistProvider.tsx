@@ -9,6 +9,8 @@ export default function SerwistProvider({ children }: { children: ReactNode }) {
     <SerwistReactProvider
       swUrl="/sw.js"
       reloadOnOnline={false}
+      // Passed to navigator.serviceWorker.register(): load /sw.js as a classic
+      // script (not type: 'module'). Matches Serwist CLI output (bundled, no ESM).
       options={{ type: 'classic' }}
     >
       {children}

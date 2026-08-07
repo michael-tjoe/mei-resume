@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useEffect, useState, type TransitionEvent } from 'react';
 import { createPortal } from 'react-dom';
-import gsap from 'gsap';
 import TypographyArt from '@/components/TypographyArt';
 import { prefersReducedMotion } from '@/helpers/prefersReducedMotion';
+import { cn } from '@/lib/cn';
 
 interface MobileNavbarMenuProps {
   isOpen: boolean;
@@ -26,7 +26,7 @@ const navItems = [
   { label: 'contact', href: '#contact' },
 ] as const;
 
-const ANIM_DURATION = 0.2;
+const ANIM_MS = 200;
 
 /** Hoisted static JSX (rendering-hoist-jsx). */
 const closeIcon = (
@@ -47,110 +47,98 @@ const closeIcon = (
 
 const typographyArt = <TypographyArt text="stefanny’s" rotate={-7.03} left={51} />;
 
+/**
+ * CSS transform/opacity transitions (compositor) instead of GSAP (main-thread
+ * rAF) — stays smoother when the CPU is busy.
+ */
+const overlayClass = cn(
+  'fixed inset-0 z-(--znavbar) bg-black',
+  'transition-opacity duration-200 ease-out motion-reduce:transition-none',
+);
+
+const menuClass = cn(
+  'fixed inset-x-0 top-0 z-(--znavbar) w-full rounded-b-[30px] bg-brand-tan pb-8',
+  // translate3d keeps the layer on the GPU for the whole open/close cycle
+  'transform-gpu backface-hidden',
+  'transition-transform duration-200 ease-out motion-reduce:transition-none',
+);
+
 function MobileNavbarMenu({ isOpen, onClose }: MobileNavbarMenuProps) {
   const [shouldRender, setShouldRender] = useState(false);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const [entered, setEntered] = useState(false);
 
   // Mount on open during render — avoids cascading setState-in-effect (rerender-derived-state-no-effect).
   if (isOpen && !shouldRender) {
     setShouldRender(true);
   }
 
-  const killTimeline = () => {
-    timelineRef.current?.kill();
-    timelineRef.current = null;
-  };
+  useEffect(() => {
+    if (!shouldRender) return;
 
-  const animateIn = useEffectEvent(() => {
-    const menu = menuRef.current;
-    const overlay = overlayRef.current;
-    if (!menu || !overlay) return;
+    let outerId = 0;
+    let innerId = 0;
+    let fallbackId = 0;
 
-    if (prefersReducedMotion()) {
-      menu.style.transform = 'none';
-      overlay.style.opacity = '0.5';
-      return;
+    const clear = () => {
+      cancelAnimationFrame(outerId);
+      cancelAnimationFrame(innerId);
+      window.clearTimeout(fallbackId);
+    };
+
+    if (isOpen) {
+      // Paint the closed (off-screen) frame first, then flip — otherwise the
+      // open transition never runs because both states land in one paint.
+      outerId = requestAnimationFrame(() => {
+        if (prefersReducedMotion()) {
+          setEntered(true);
+          return;
+        }
+        innerId = requestAnimationFrame(() => setEntered(true));
+      });
+      return clear;
     }
 
-    killTimeline();
-    gsap.set(menu, { yPercent: -100 });
-    gsap.set(overlay, { opacity: 0 });
-    timelineRef.current = gsap
-      .timeline()
-      .to(menu, {
-        yPercent: 0,
-        duration: ANIM_DURATION,
-        ease: 'none',
-      })
-      .to(
-        overlay,
-        {
-          opacity: 0.5,
-          duration: ANIM_DURATION,
-          ease: 'none',
-        },
-        0,
-      );
-  });
+    outerId = requestAnimationFrame(() => {
+      if (prefersReducedMotion()) {
+        setShouldRender(false);
+        setEntered(false);
+        return;
+      }
+      setEntered(false);
+      // Fallback if transitionend is skipped (tab backgrounded, etc.)
+      fallbackId = window.setTimeout(() => {
+        setShouldRender(false);
+        setEntered(false);
+      }, ANIM_MS + 50);
+    });
 
-  const animateOut = useEffectEvent(() => {
-    const menu = menuRef.current;
-    const overlay = overlayRef.current;
-
-    if (!menu || !overlay || prefersReducedMotion()) {
-      setShouldRender(false);
-      return;
-    }
-
-    killTimeline();
-    timelineRef.current = gsap
-      .timeline({
-        onComplete: () => setShouldRender(false),
-      })
-      .to(menu, {
-        yPercent: -100,
-        duration: ANIM_DURATION,
-        ease: 'none',
-      })
-      .to(
-        overlay,
-        {
-          opacity: 0,
-          duration: ANIM_DURATION,
-          ease: 'none',
-        },
-        0,
-      );
-  });
-
-  useEffect(() => {
-    if (!shouldRender || !isOpen) return;
-    animateIn();
-    return killTimeline;
-  }, [shouldRender, isOpen]);
-
-  useEffect(() => {
-    if (isOpen || !shouldRender) return;
-    animateOut();
-    return killTimeline;
+    return clear;
   }, [isOpen, shouldRender]);
+
+  const onMenuTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== 'transform') return;
+    if (isOpen) return;
+    setShouldRender(false);
+    setEntered(false);
+  };
 
   if (!shouldRender) return null;
 
   return createPortal(
     <>
       <div
-        ref={overlayRef}
-        className="fixed inset-0 z-(--znavbar) bg-black opacity-0"
+        className={cn(overlayClass, entered ? 'opacity-50' : 'opacity-0')}
         onClick={onClose}
         aria-hidden="true"
       />
 
       <div
-        ref={menuRef}
-        className="fixed inset-x-0 top-0 z-(--znavbar) w-full rounded-b-[30px] bg-brand-tan pb-8"
+        className={cn(
+          menuClass,
+          entered ? 'translate-y-0' : '-translate-y-full',
+        )}
+        onTransitionEnd={onMenuTransitionEnd}
       >
         <button
           type="button"
