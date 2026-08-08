@@ -47,12 +47,15 @@ export default function Portofolio() {
         </div>
 
         <div className="flex h-full shrink-0 grow-0 flex-col items-start pl-35.5">
-          <div className="flex h-full pl-18">
+          <div className="flex h-full pl-[calc(72/1080*100vh)]">
             {SOCIAL_MEDIA_DESIGNS_PORTOFOLIO.map((portfolio, index) => (
               <WithPhonePortofolioLayout
                 key={portfolio.name}
                 {...portfolio}
-                className={cn(index % 2 === 1 && 'bg-white', index > 0 && 'pl-18')}
+                className={cn(
+                  index % 2 === 1 && 'bg-white',
+                  index > 0 && 'pl-[calc(72/1080*100vh)]',
+                )}
               />
             ))}
             {UI_DESIGNS_PORTOFOLIO.map((portfolio, index) => {
@@ -64,7 +67,7 @@ export default function Portofolio() {
                   {...portfolio}
                   className={cn(
                     globalIndex % 2 === 1 && 'bg-white',
-                    globalIndex > 0 && 'pl-18',
+                    globalIndex > 0 && 'pl-[calc(72/1080*100vh)]',
                   )}
                 />
               );
@@ -79,7 +82,8 @@ export default function Portofolio() {
                   {...portfolio}
                   className={cn(
                     globalIndex % 2 === 1 && 'bg-white',
-                    globalIndex > 0 && 'pl-18',
+                    globalIndex > 0 && 'pl-[calc(72/1080*100vh)]',
+                    portfolio.className,
                   )}
                 />
               );

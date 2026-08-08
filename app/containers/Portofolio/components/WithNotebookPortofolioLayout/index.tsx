@@ -40,7 +40,7 @@ function WithNotebookPortofolioLayout({
     >
       <div className="relative flex h-full shrink-0 grow-0 flex-col overflow-hidden">
         <PortofolioTypeItem
-          className="pt-[calc(92/1920*100vh)] pb-[calc(94/1080*100vh)] shrink-0 grow-0"
+          className="shrink-0 grow-0 pt-[calc(92/1920*100vh)] pb-[calc(94/1080*100vh)]"
           name={name}
           subtitle={subtitle}
           href={href}
@@ -48,7 +48,7 @@ function WithNotebookPortofolioLayout({
         />
 
         <div
-          className="relative max-w-full h-full mt-auto shrink-0 grow overflow-hidden"
+          className="relative h-full max-w-full shrink-0 grow overflow-hidden"
           style={{ aspectRatio: firstAspectRatio }}
         >
           <Image
@@ -86,7 +86,7 @@ function WithNotebookPortofolioLayout({
 
       {collectionFrame && collectionFrameAspectRatio ? (
         <div
-          className="z-20 pointer-events-none absolute h-full"
+          className="pointer-events-none absolute z-20 h-full"
           style={{
             aspectRatio: collectionFrameAspectRatio,
             right: frameRight,
@@ -97,7 +97,7 @@ function WithNotebookPortofolioLayout({
             src={collectionFrame}
             alt={`${name} collection frame`}
             fill
-            className="object-contain object-center-right"
+            className="object-center-right object-contain"
             unoptimized
           />
         </div>

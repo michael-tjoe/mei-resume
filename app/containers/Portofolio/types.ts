@@ -23,4 +23,6 @@ export type NotebookCompanyBlock = Omit<FeaturedCompanyBlock, 'collectionFrame'>
     right?: number | string;
     bottom?: number | string;
   };
+  /** Extra layout classes merged with index-based desktop spacing/background. */
+  className?: string;
 };

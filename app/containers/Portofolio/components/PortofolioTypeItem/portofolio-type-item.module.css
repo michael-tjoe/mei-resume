@@ -30,14 +30,14 @@
   }
 
   .name {
-    @apply text-2xl/normal whitespace-normal;
+    @apply text-[calc(24/1080*100vh)]/normal whitespace-normal;
   }
 
   .subtitle {
-    @apply text-xl/normal whitespace-normal;
+    @apply text-[calc(20/1080*100vh)]/normal whitespace-normal;
   }
 
   .link {
-    @apply size-16.75;
+    @apply size-[calc(67/1080*100vh)];
   }
 }
